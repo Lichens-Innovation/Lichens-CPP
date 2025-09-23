@@ -9,7 +9,7 @@
 namespace LichensCPP
 {
 
-ConfigValue ConfigValue::NULL_CONFIG_VALUE = {};
+const ConfigValue ConfigValue::NULL_CONFIG_VALUE = {};
 
 ConfigValue::ConfigValue()
     : value(nullptr)
@@ -259,7 +259,6 @@ ConfigValueObject merge_config_objects(const ConfigValueObject& a, const ConfigV
             if (it->second->is_object() && b_val->is_object())
             {
                 // Recursively merge objects
-                it->second = std::make_shared<ConfigValue>();
                 it->second->value = merge_config_objects(it->second->get_object(), b_val->get_object());
             }
             else

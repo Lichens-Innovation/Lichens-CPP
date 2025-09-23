@@ -39,8 +39,9 @@ public:
     /// @param key The key of the configuration value.
     /// @return A reference to the configuration value, or std::nullopt if not found.
     const ConfigValue& get_value(const std::string& key) const;
-    const ConfigValue& get_value(const std::vector<std::string>& keys) const;
+    const ConfigValue& get_value(const ConfigMultiKey& keys) const;
 
+    const ConfigValue& operator[](const std::string& key) const;
 
 private:
     struct ConfigPrivate;

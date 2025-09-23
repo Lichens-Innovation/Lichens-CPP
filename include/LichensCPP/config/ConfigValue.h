@@ -43,7 +43,7 @@ struct ConfigValue
 {
     ConfigValueType value;
 
-    static ConfigValue NULL_CONFIG_VALUE;
+    static const ConfigValue NULL_CONFIG_VALUE;
 
     ConfigValue();
     ConfigValue(bool v);

@@ -43,7 +43,7 @@ inline const ConfigValue& get_config_value(std::size_t config_type, const std::s
     return get_config(config_type).get_value(subkey);
 }
 
-inline const ConfigValue& get_config_value(std::size_t config_type, const std::vector<std::string>& subkeys)
+inline const ConfigValue& get_config_value(std::size_t config_type, const ConfigMultiKey& subkeys)
 {
     return get_config(config_type).get_value(subkeys);
 }
@@ -55,7 +55,7 @@ inline const ConfigValue& get_config_value(const T& config_type, const std::stri
 }
 
 template<typename T, typename = typename std::enable_if<std::is_enum<T>::value, T>::type>
-inline const ConfigValue& get_config_value(const T& config_type, const std::vector<std::string>& subkeys)
+inline const ConfigValue& get_config_value(const T& config_type, const ConfigMultiKey& subkeys)
 {
     return get_config(config_type).get_value(subkeys);
 }

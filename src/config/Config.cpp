@@ -218,7 +218,7 @@ const ConfigValue& Config::get_value(const std::string& key) const
     return ConfigValue::NULL_CONFIG_VALUE;
 }
 
-const ConfigValue& Config::get_value(const std::vector<std::string>& keys) const
+const ConfigValue& Config::get_value(const ConfigMultiKey& keys) const
 {
     if(keys.empty())
     {
@@ -239,6 +239,11 @@ const ConfigValue& Config::get_value(const std::vector<std::string>& keys) const
         current = &current->get_child(*itr);
     }
     return *current;
+}
+
+const ConfigValue& Config::operator[](const std::string& key) const
+{
+    return get_value(key);
 }
 
 } // namespace LichensCPP

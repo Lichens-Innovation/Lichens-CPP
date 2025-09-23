@@ -5,6 +5,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <sstream>
 
 #include "LichensCPP/config/ConfigValue.h"
 
@@ -238,4 +239,54 @@ TEST(ConfigValueTest, ObjectValue)
     EXPECT_EQ(config_value.get_child("d").get_child("e").get_int(), 3);
     EXPECT_EQ(config_value["d"]["e"].get_int(), 3);
     EXPECT_EQ(config_value.get_child(ConfigMultiKey{"d", "e"}).get_int(), 3);
+}
+
+TEST(ConfigValueTest, OstreamOutput)
+{
+    ConfigValue config_value;
+    config_value.value = ConfigValueObject{
+        {"a", make_container_value(1)},
+        {"b", make_container_value(ConfigValueObject{
+            {"c", make_container_value(2)}
+        })},
+        {"d", make_container_value(ConfigValueArray{
+            make_container_value(3), 
+            make_container_value(4)
+        })}
+    };
+
+    std::stringstream ss;
+    ss << config_value;
+    // NOTE: this is fragile since it can changed based on unordored_map order
+    EXPECT_EQ(ss.str(), "{\"b\": {\"c\": 2}, \"d\": [3, 4], \"a\": 1}");
+}
+
+TEST(ConfigValueTest, ObjectMerge)
+{
+    ConfigValueObject config_value_1 {
+        {"a", make_container_value(1)},
+        {"b", make_container_value(2)},
+        {"d", make_container_value(ConfigValueObject{
+            {"e", make_container_value(10)},
+            {"f", make_container_value(11)}
+        })}
+    };
+
+    ConfigValueObject config_value_2 {
+        {"b", make_container_value(3)},
+        {"c", make_container_value(4)},
+        {"d", make_container_value(ConfigValueObject{
+            {"f", make_container_value(12)},
+            {"g", make_container_value(13)}
+        })}
+    };
+
+    ConfigValue config_merged = merge_config_objects(config_value_1, config_value_2);
+
+    EXPECT_EQ(config_merged["a"].get_int(), 1);
+    EXPECT_EQ(config_merged["b"].get_int(), 3);
+    EXPECT_EQ(config_merged["c"].get_int(), 4);
+    EXPECT_EQ(config_merged["d"]["e"].get_int(), 10);
+    EXPECT_EQ(config_merged["d"]["f"].get_int(), 12);
+    EXPECT_EQ(config_merged["d"]["g"].get_int(), 13);
 }
