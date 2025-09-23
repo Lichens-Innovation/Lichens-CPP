@@ -1,0 +1,52 @@
+{
+    "name": "Lichens CPP Dev Environment",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "formulahendry.code-runner",
+                "ms-vscode.cpptools-extension-pack",
+                "doi.fileheadercomment"
+            ],
+            "settings": {
+                "cmake.configureOnOpen": true,
+                "C_Cpp.default.cStandard": "c23",
+                "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
+                "C_Cpp.default.compilerPath": "/usr/bin/clang",
+                "fileHeaderComment.parameter": {
+                    "*": {
+                        "Author": "${user}",
+                        "Date": "Created on ${date}",
+                        "commentbegin": "/*",
+                        "commentprefix": " *",
+                        "commentend": " */",
+                        "company": "Lichens",
+                        "Copyright": "Copyright (C) Lichens - All Rights Reserved",
+                        "License": "See LICENSE file for more details."
+                    }
+                },
+                "fileHeaderComment.template": {
+                    "*":[
+                        "${commentbegin}",
+                        "${commentprefix}",
+                        "${commentprefix} Copyright (c) ${year} ${company}",
+                        "${commentprefix}",
+                        "${commentprefix} ${License}",
+                        "${commentprefix}",
+                        "${commentprefix} Created on ${date}",
+                        "${commentend}"
+                    ]
+                }
+            }
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind"
+    ],
+    "workspaceFolder": "/workspace",
+    "remoteUser": "devuser"
+  }
