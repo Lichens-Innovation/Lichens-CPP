@@ -61,6 +61,7 @@ struct ConfigValue
     
     bool is_leaf() const;
 
+    bool is_numerical() const;
     bool is_array() const;
     bool is_object() const;
 

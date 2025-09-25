@@ -23,6 +23,7 @@ TEST(ConfigValueTest, DefaultConstructor)
     EXPECT_FALSE(config_value.is_int());
     EXPECT_FALSE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_FALSE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_TRUE(config_value.is_leaf());
@@ -55,13 +56,14 @@ TEST(ConfigValueTest, BoolValue)
     EXPECT_FALSE(config_value.is_int());
     EXPECT_FALSE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_FALSE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_TRUE(config_value.is_leaf());
 
     EXPECT_TRUE(config_value.get_bool());
-    EXPECT_EQ(config_value.get_int(), 0);
-    EXPECT_EQ(config_value.get_double(), 0.0);
+    EXPECT_EQ(config_value.get_int(), 1);
+    EXPECT_EQ(config_value.get_double(), 1.0);
     EXPECT_EQ(config_value.get_string(), std::string());
     EXPECT_EQ(config_value.get_array(), empty_array);
     EXPECT_EQ(config_value.get_object(), empty_object);
@@ -83,13 +85,14 @@ TEST(ConfigValueTest, IntValue)
     EXPECT_TRUE(config_value.is_int());
     EXPECT_FALSE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_TRUE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_TRUE(config_value.is_leaf());
 
-    EXPECT_EQ(config_value.get_bool(), false);
+    EXPECT_EQ(config_value.get_bool(), true);
     EXPECT_EQ(config_value.get_int(), 42);
-    EXPECT_EQ(config_value.get_double(), 0.0);
+    EXPECT_EQ(config_value.get_double(), 42.0);
     EXPECT_EQ(config_value.get_string(), std::string());
     EXPECT_EQ(config_value.get_array(), empty_array);
     EXPECT_EQ(config_value.get_object(), empty_object);
@@ -111,12 +114,13 @@ TEST(ConfigValueTest, DoubleValue)
     EXPECT_FALSE(config_value.is_int());
     EXPECT_TRUE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_TRUE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_TRUE(config_value.is_leaf());
 
-    EXPECT_EQ(config_value.get_bool(), false);
-    EXPECT_EQ(config_value.get_int(), 0);
+    EXPECT_EQ(config_value.get_bool(), true);
+    EXPECT_EQ(config_value.get_int(), 3);
     EXPECT_EQ(config_value.get_double(), 3.14);
     EXPECT_EQ(config_value.get_string(), std::string());
     EXPECT_EQ(config_value.get_array(), empty_array);
@@ -138,6 +142,7 @@ TEST(ConfigValueTest, StringValue)
     EXPECT_FALSE(config_value.is_bool());
     EXPECT_FALSE(config_value.is_int());
     EXPECT_TRUE(config_value.is_string());
+    EXPECT_FALSE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_TRUE(config_value.is_leaf());
@@ -169,6 +174,7 @@ TEST(ConfigValueTest, ArrayValue)
     EXPECT_FALSE(config_value.is_int());
     EXPECT_FALSE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_FALSE(config_value.is_numerical());
     EXPECT_TRUE(config_value.is_array());
     EXPECT_FALSE(config_value.is_object());
     EXPECT_FALSE(config_value.is_leaf());
@@ -210,6 +216,7 @@ TEST(ConfigValueTest, ObjectValue)
     EXPECT_FALSE(config_value.is_int());
     EXPECT_FALSE(config_value.is_double());
     EXPECT_FALSE(config_value.is_string());
+    EXPECT_FALSE(config_value.is_numerical());
     EXPECT_FALSE(config_value.is_array());
     EXPECT_TRUE(config_value.is_object());
     EXPECT_FALSE(config_value.is_leaf());

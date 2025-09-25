@@ -232,7 +232,7 @@ const ConfigValue& Config::get_value(const ConfigMultiKey& keys) const
 
     for(auto itr = keys.begin() + 1; itr != keys.end(); ++itr)
     {
-        if (current != nullptr || itr->empty())
+        if (current == nullptr || itr->empty())
         {
             return ConfigValue::NULL_CONFIG_VALUE;
         }

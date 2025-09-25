@@ -76,6 +76,11 @@ bool ConfigValue::is_leaf() const
     return is_empty() || is_bool() || is_int() || is_double() || is_string();
 }
 
+bool ConfigValue::is_numerical() const
+{
+    return is_int() || is_double();
+}
+
 bool ConfigValue::is_array() const
 {
     return std::holds_alternative<ConfigValueArray>(value);
@@ -92,6 +97,14 @@ bool ConfigValue::get_bool(bool default_value) const
     {
         return std::get<bool>(value);
     }
+    else if(is_int())
+    {
+        return std::get<int>(value) != 0;
+    }
+    else if(is_double())
+    {
+        return std::get<double>(value) != 0.0;
+    }
     return default_value;
 }
 
@@ -101,6 +114,14 @@ int ConfigValue::get_int(int default_value) const
     {
         return std::get<int>(value);
     }
+    else if(is_double())
+    {
+        return static_cast<int>(std::get<double>(value));
+    }
+    else if(is_bool())
+    {
+        return std::get<bool>(value) ? 1 : 0;
+    }
     return default_value;
 }
 double ConfigValue::get_double(double default_value) const
@@ -109,6 +130,15 @@ double ConfigValue::get_double(double default_value) const
     {
         return std::get<double>(value);
     }
+    else if(is_int())
+    {
+        return static_cast<double>(std::get<int>(value));
+    }
+    else if(is_bool())
+    {
+        return std::get<bool>(value) ? 1.0 : 0.0;
+    }
+    
     return default_value;
 }
 
