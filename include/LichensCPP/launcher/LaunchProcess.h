@@ -29,7 +29,6 @@ public:
 private:
     std::string m_command;
     std::vector<std::string> m_args;
-    std::vector<char*> m_argv;
     pid_t m_pid;
 };
 

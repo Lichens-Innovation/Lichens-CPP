@@ -23,11 +23,6 @@ LaunchProcess::LaunchProcess(const std::string& command, const std::vector<std::
     , m_args(args)
     , m_pid(-1)
 {
-    for (const auto& arg : m_args)
-    {
-        m_argv.push_back(const_cast<char*>(arg.c_str()));
-    }
-    m_argv.push_back(nullptr); // argv must be null-terminated
 }
 
 LaunchProcess::~LaunchProcess()
@@ -89,7 +84,17 @@ bool LaunchProcess::launch()
 {
     // Launch the process not matter what
     m_pid = -1;
-    return posix_spawn(&m_pid, m_command.c_str(), nullptr, nullptr, m_argv.data(), nullptr) == 0;
+
+    std::vector<const char *> argv;
+    argv.reserve(m_args.size() + 2u);
+    argv.emplace_back(m_command.c_str());
+    for (const auto &arg : m_args)
+    {
+        argv.emplace_back(arg.c_str());
+    }
+    argv.emplace_back(nullptr); // argv must be null-terminated
+
+    return posix_spawn(&m_pid, m_command.c_str(), nullptr, nullptr, const_cast<char *const *>(argv.data()), nullptr) == 0;
 }
 
 bool LaunchProcess::relaunch_if_not_running()
