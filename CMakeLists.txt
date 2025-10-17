@@ -120,6 +120,7 @@ if(BUILD_LICHENS_CPP_TESTS)
 
     add_executable(test_lichens_cpp
         tests/main.cpp
+        tests/test_stringutil.cpp
         tests/config/test_Config.cpp
         tests/config/test_ConfigValue.cpp
     )

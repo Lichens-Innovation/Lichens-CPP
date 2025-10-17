@@ -12,24 +12,38 @@
 namespace LichensCPP
 {
 
-class LaunchProcess
-{
-public:
-    LaunchProcess(const std::string& command, const std::vector<std::string>& args = {});
-    ~LaunchProcess();
+    enum class RelaunchStatus
+    {
+        Running = 0,
+        Relaunched,
+        Failed
+    };
 
-    pid_t pid() const;
-    bool is_running() const;
+    class LaunchProcess
+    {
+    public:
+        LaunchProcess(const std::string &command, const std::vector<std::string> &args = {}, bool detached = false);
+        ~LaunchProcess();
 
-    bool terminate();
-    bool launch();
+        pid_t pid() const;
+        bool is_running() const;
 
-    bool relaunch_if_not_running();
+        bool terminate();
+        bool launch();
 
-private:
-    std::string m_command;
-    std::vector<std::string> m_args;
-    pid_t m_pid;
-};
+        RelaunchStatus relaunch_if_not_running();
+
+        static std::string shell_escape(const std::string &arg);
+        static std::string build_command(const std::vector<std::string> &args);
+
+    private:
+        bool launch_attached();
+        bool launch_detached();
+
+        const bool m_detached;
+        const std::string m_command;
+        const std::vector<std::string> m_args;
+        pid_t m_pid;
+    };
 
 } // namespace LichensCPP

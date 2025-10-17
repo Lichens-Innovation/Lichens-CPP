@@ -27,7 +27,7 @@ namespace LichensCPP
 struct Logger::LoggerPrivate
 {
     std::shared_ptr<spdlog::logger> logger;
-    std::mutex logMutex;
+    std::mutex log_mutex;
     std::vector<spdlog::sink_ptr> sinks;
 
     spdlog::level::level_enum toSpdLevel(LogLevel level)
@@ -50,6 +50,7 @@ struct Logger::LoggerPrivate
 
     void add_console_logger(LogLevel level)
     {
+        std::lock_guard<std::mutex> lock(log_mutex);
         auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         console_sink->set_level(toSpdLevel(level));
         sinks.push_back(console_sink);
@@ -59,6 +60,7 @@ struct Logger::LoggerPrivate
     {
         const std::string log_file_path = std::string(folder) + "/" + std::string(filename);
         std::filesystem::create_directories(folder);
+        std::lock_guard<std::mutex> lock(log_mutex);
         auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
             log_file_path, PLAZ_LOGGER_MAX_FILE_SIZE, PLAZ_LOGGER_MAX_FILES);
         file_sink->set_level(toSpdLevel(level));
@@ -68,6 +70,7 @@ struct Logger::LoggerPrivate
     void add_syslog_logger(const std::string& logger_name, LogLevel level)
     {
         // TODO godboutj 2025-09-08, check if we should LOG_DAEMON instead of LOG_USER
+        std::lock_guard<std::mutex> lock(log_mutex);
         auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(logger_name, 0, LOG_USER, true);
         syslog_sink->set_level(toSpdLevel(level));
         sinks.push_back(syslog_sink);
@@ -82,10 +85,22 @@ struct Logger::LoggerPrivate
         logger->flush_on(spdlog::level::err); // Flush on error level and above
     }
 
+    void shutdown()
+    {
+        std::lock_guard<std::mutex> lock(log_mutex);
+        spdlog::shutdown(); // This flushes and cleans up all loggers, do not log anything after this
+    }
+
     void log(const LogLevel level, const std::string& message)
     {
         logger->log(toSpdLevel(level), message);
-    }   
+    }
+    
+    void flush_all()
+    {
+        std::lock_guard<std::mutex> lock(log_mutex);
+        logger->flush();
+    }
 };
 
 Logger::Logger()
@@ -121,6 +136,11 @@ Logger& Logger::init(const std::string& logger_name)
     return *this;
 }
 
+void Logger::shutdown()
+{
+    p_->shutdown();
+}
+
 Logger& Logger::instance()
 {
     static Logger instance;
@@ -130,6 +150,11 @@ Logger& Logger::instance()
 void Logger::log(const LogLevel level, const std::string& message)
 {
     p_->log(level, message);
+}
+
+void Logger::flush_all()
+{
+    p_->flush_all();
 }
 
 } // namespace LichensCPP

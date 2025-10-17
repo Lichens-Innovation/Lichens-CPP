@@ -20,6 +20,9 @@
 namespace LichensCPP
 {
 
+#define LOG_FLUSH() LichensCPP::Logger::instance().flush_all()
+#define LOG_SHUTDOWN() LichensCPP::Logger::instance().shutdown()
+
 #define LOG(level, message) LichensCPP::Logger::instance().log(level, message)
 
 #define LOG_TRACE(message)   LOG(LichensCPP::LogLevel::TRACE,   message)

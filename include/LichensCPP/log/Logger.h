@@ -34,9 +34,12 @@ public:
 
     // Must call the init after the add_xxx_logger methods but before any log()
     Logger& init(const std::string& logger_name);
+    void shutdown();
 
     static Logger& instance();
     void log(const LogLevel level, const std::string& message);
+
+    void flush_all();
     
 private:
     struct LoggerPrivate;
