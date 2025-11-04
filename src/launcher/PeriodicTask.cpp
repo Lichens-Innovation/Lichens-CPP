@@ -4,7 +4,7 @@
  * Copyright (c) 2025 Lichens Inc. All rights reserved.
  */
 
-#include "PeriodicTask.h"
+#include "LichensCPP/launcher/PeriodicTask.h"
 
 #include <thread>
 
