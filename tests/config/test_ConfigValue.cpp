@@ -264,7 +264,7 @@ TEST(ConfigValueTest, OstreamOutput)
 
     std::stringstream ss;
     ss << config_value;
-    // NOTE: this is fragile since it can changed based on unordored_map order
+    // NOTE: this is fragile since it can change based on unordered_map order
     EXPECT_EQ(ss.str(), "{\"b\": {\"c\": 2}, \"d\": [3, 4], \"a\": 1}");
 }
 
