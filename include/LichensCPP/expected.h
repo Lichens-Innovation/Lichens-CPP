@@ -12,7 +12,7 @@
 namespace LichensCPP 
 {
 
-// Use std::expected if available, otherwise fall back to tl::expected as shiv
+// Use std::expected if available, otherwise fall back to tl::expected as shim
 #if __cpp_lib_expected >= 202202L
     #include <expected>
         template <class T, class E>
