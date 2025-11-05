@@ -26,10 +26,10 @@ RUN apt-get update && \
         ninja-build \
         openssl \
         just \
+        libfmt-dev \
         libmosquitto-dev \
         libpaho-mqtt-dev \
         libpaho-mqttpp-dev \
-        libspdlog-dev \
         nlohmann-json3-dev \
         mosquitto-clients \
     && rm -rf /var/lib/apt/lists/*

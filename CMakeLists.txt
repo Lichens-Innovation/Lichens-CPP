@@ -16,6 +16,8 @@ endif()
 
 message(STATUS "Lichens CPP using CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(FetchContent)
 
 # CMake options to enable/disable modules
@@ -42,17 +44,23 @@ set(INCLUDES_PRIVATE
 # spdlog
 if(BUILD_LICHENS_CPP_LOG)
     find_package(fmt REQUIRED)
-    find_path(SPDLOG_INCLUDE_DIR spdlog/spdlog.h)
-    if(NOT SPDLOG_INCLUDE_DIR)
-        message(FATAL_ERROR "spdlog headers not found. Please install spdlog.")
-    endif()
+    set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+    set(SPDLOG_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "" FORCE)
+    FetchContent_Declare(
+      spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.15.3
+    )
+    FetchContent_MakeAvailable(spdlog)
     list(APPEND LIBRARY_USED
         fmt::fmt
+        spdlog::spdlog
     )
     list(APPEND SOURCES 
         src/log/Logger.cpp
     )
-    list(APPEND INCLUDES_PRIVATE ${SPDLOG_INCLUDE_DIR})
     add_definitions(-DBUILD_LICHENS_CPP_LOG)
 endif()
 
