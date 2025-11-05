@@ -3,7 +3,18 @@ project(lichens_cpp_project LANGUAGES CXX)
 
 cmake_policy(SET CMP0135 NEW)
 
-set(CMAKE_CXX_STANDARD 23)
+# C++ 17 or better
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
+    message(FATAL_ERROR "Lichens-CPP requires at least C++17. Current CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
+endif()
+
+message(STATUS "Lichens CPP using CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
 
 include(FetchContent)
 
