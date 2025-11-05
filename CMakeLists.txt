@@ -18,6 +18,14 @@ message(STATUS "Lichens CPP using CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    add_compile_options(-Wall -Wextra -Werror -pedantic -Wuninitialized -Wunused-variable)
+elseif (MSVC)
+    add_compile_options(/W4 /WX /we4101)
+else()
+    message(WARNING "Compiler not recognized, default warning flags will be used.")
+endif()
+
 include(FetchContent)
 
 # CMake options to enable/disable modules
