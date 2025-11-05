@@ -35,13 +35,13 @@ inline const ConfigValue& get_config_value(std::size_t config_type, const Config
     return get_config(config_type).get_value(subkeys);
 }
 
-template<typename T, typename = typename std::enable_if<!std::is_same<T, std::size_t>::value>>
+template<typename T, typename = std::enable_if_t<!std::is_same<T, std::size_t>::value>>
 inline const ConfigValue& get_config_value(const T& config_type, const std::string& subkey)
 {
     return get_config(config_type).get_value(subkey);
 }
 
-template<typename T, typename = typename std::enable_if<!std::is_same<T, std::size_t>::value>>
+template<typename T, typename = std::enable_if_t<!std::is_same<T, std::size_t>::value>>
 inline const ConfigValue& get_config_value(const T& config_type, const ConfigMultiKey& subkeys)
 {
     return get_config(config_type).get_value(subkeys);
