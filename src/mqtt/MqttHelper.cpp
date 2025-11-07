@@ -201,6 +201,20 @@ namespace LichensCPP
             return id;
         }
 
+        void unsubscribe(size_t subscribe_id)
+        {
+            auto it = subscriptions.find(subscribe_id);
+            if (it == subscriptions.end())
+            {
+                LOG_INFO_F("No subscription found with ID: %zu", subscribe_id);
+                return;
+            }
+            
+            mqtt_client->unsubscribe(it->second.topic)->wait();
+            LOG_TRACE_F("Unsubscribed from topic: %s", it->second.topic);
+            subscriptions.erase(it);            
+        }
+
         void publish(const std::string& topic, const void* message, size_t size)
         {
             try
@@ -253,6 +267,11 @@ namespace LichensCPP
     size_t MqttHelper::subscribe(const std::string& topic, CallbackMqttMessage callback) const
     {
         return p_->subscribe(topic, callback);
+    }
+
+    void MqttHelper::unsubscribe(size_t subscribe_id) const
+    {
+        p_->unsubscribe(subscribe_id);
     }
 
     void MqttHelper::publish(const std::string& topic, const std::vector<std::byte>& message) const

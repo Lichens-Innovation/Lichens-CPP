@@ -4,7 +4,6 @@
  * Copyright (c) 2025 Lichens Inc. All rights reserved.
  */
 
-#include <iostream>
 #include <fstream>
 
 #include "LichensCPP/fileutil.h"

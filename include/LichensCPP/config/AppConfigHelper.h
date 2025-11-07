@@ -19,7 +19,7 @@ inline const Config& get_config(std::size_t config_type)
     return AppConfig::instance()[config_type];
 }
 
-template<typename T, typename = typename std::enable_if_t<!std::is_same<T, std::size_t>::value>>
+template<typename T, typename = std::enable_if_t<!std::is_same<T, std::size_t>::value>>
 inline const Config& get_config(const T& config_type)
 {
     return AppConfig::instance()[static_cast<std::size_t>(config_type)];
