@@ -21,7 +21,7 @@ struct PeriodicTask::PeriodicTaskPrivate
     bool m_running;
 
     PeriodicTaskPrivate(std::chrono::milliseconds interval, std::function<bool()> callback)
-        : m_task(callback), m_interval(interval), m_worker_thread(), m_running(false)
+        : m_interval(interval), m_task(callback), m_worker_thread(), m_running(false)
     {
     }
 
