@@ -36,7 +36,9 @@ option(BUILD_LICHENS_CPP_MQTT "Build the MQTT module." ON)
 option(BUILD_LICHENS_CPP_TESTS "Build the tests tree." ON)
 
 set(SOURCES
+    src/fileutil.cpp
     src/stringutil.cpp
+    src/uuid.cpp
 )
 
 set(LIBRARY_USED
