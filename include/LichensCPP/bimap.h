@@ -107,13 +107,13 @@ namespace LichensCPP
             reverse_map.reserve(n);
         }
 
-        T2 operator[](const T1 &key) const
+        const T2& operator[](const T1 &key) const
         {
             return forward_map.at(key);
         }
 
         template <typename U = T2, typename = std::enable_if_t<!std::is_same_v<T1, U>>>
-        T1 operator[](const T2 &value) const
+        const T1& operator[](const T2 &value) const
         {
             return reverse_map.at(value);
         }
