@@ -92,6 +92,8 @@ if(BUILD_LICHENS_CPP_LAUNCHER)
     message(STATUS "Building Lichens-CPP Launcher module.")
     list(APPEND SOURCES 
         src/launcher/LaunchProcess.cpp
+        src/launcher/MainLoopHelper.cpp
+        src/launcher/PeriodicTask.cpp
     )
     add_definitions(-DBUILD_LICHENS_CPP_LAUNCHER)
 endif()

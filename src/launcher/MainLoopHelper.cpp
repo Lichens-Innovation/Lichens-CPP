@@ -64,7 +64,7 @@ namespace LichensCPP
         while (running)
         {
             task();
-            cv.wait_for(lock, m_interval);
+            cv.wait_for(lock, p_->m_interval);
         }
     }
 
