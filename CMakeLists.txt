@@ -38,6 +38,7 @@ option(BUILD_LICHENS_CPP_TESTS "Build the tests tree." ON)
 set(SOURCES
     src/fileutil.cpp
     src/stringutil.cpp
+    src/timeutil.cpp
     src/uuid.cpp
 )
 
