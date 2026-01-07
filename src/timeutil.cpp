@@ -28,7 +28,11 @@ namespace LichensCPP
 
     int64_t time_delta(uint64_t t_reference, uint64_t t_relative)
     {
-        return static_cast<int64_t>(t_relative - t_reference);
+        if (t_relative >= t_reference)
+        {
+            return static_cast<int64_t>(t_relative - t_reference);
+        }
+        return -static_cast<int64_t>(t_reference - t_relative);
     }
 
     uint64_t time_delta_past_now(uint64_t past_timestamp)
