@@ -47,7 +47,7 @@ namespace LichensCPP
 
     int64_t time_delta_now(uint64_t past_timestamp)
     {
-        return time_delta(time_now(), past_timestamp);
+        return time_delta(past_timestamp, time_now());
     }
 
     float time_sec(uint64_t t)
