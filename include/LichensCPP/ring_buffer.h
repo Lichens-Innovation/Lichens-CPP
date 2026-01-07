@@ -9,6 +9,7 @@
 #include <vector>
 #include <stdexcept>
 #include <cstddef>
+#include <optional>
 
 namespace LichensCPP
 {
@@ -124,6 +125,17 @@ public:
         }
     }
 
+    std::optional<T> pop()
+    {
+        if (empty())
+        {
+            return std::nullopt;
+        }
+        T value = front();
+        --size_;
+        return value;
+    }
+
     // Access by 0 = oldest, size()-1 = newest
     T& operator[](std::size_t index)
     {
@@ -149,6 +161,11 @@ public:
     std::size_t capacity() const noexcept { return capacity_; }
     bool empty() const noexcept { return size_ == 0u; }
     bool full() const noexcept { return size_ == capacity_; }
+    void clear() noexcept
+    {
+        head_ = 0u;
+        size_ = 0u;
+    }
 
     // Returns newest element
     T& back()

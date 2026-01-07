@@ -41,6 +41,52 @@ TEST(RingBuffer, PushAndAccess)
     EXPECT_EQ(rb.back(), 30);
 }
 
+TEST(RingBuffer, PopElements)
+{
+    RingBuffer<int> rb(3);
+
+    rb.push(1);
+    rb.push(2);
+    rb.push(3);
+
+    auto val1 = rb.pop();
+    EXPECT_TRUE(val1.has_value());
+    EXPECT_EQ(val1.value(), 1);
+    EXPECT_EQ(rb.size(), 2u);
+    EXPECT_EQ(rb[0], 2);
+    EXPECT_EQ(rb[1], 3);
+
+    auto val2 = rb.pop();
+    EXPECT_TRUE(val2.has_value());
+    EXPECT_EQ(val2.value(), 2);
+    EXPECT_EQ(rb.size(), 1u);
+    EXPECT_EQ(rb[0], 3);
+
+    auto val3 = rb.pop();
+    EXPECT_TRUE(val3.has_value());
+    EXPECT_EQ(val3.value(), 3);
+    EXPECT_EQ(rb.size(), 0u);
+
+    auto val4 = rb.pop();
+    EXPECT_FALSE(val4.has_value());
+}
+
+TEST(RingBuffer, ClearBuffer)
+{
+    RingBuffer<int> rb(4);
+
+    rb.push(5);
+    rb.push(10);
+    rb.push(15);
+
+    EXPECT_EQ(rb.size(), 3u);
+
+    rb.clear();
+
+    EXPECT_EQ(rb.size(), 0u);
+    EXPECT_TRUE(rb.empty());
+}
+
 TEST(RingBuffer, OverwriteOldestWhenFull)
 {
     RingBuffer<int> rb(3);

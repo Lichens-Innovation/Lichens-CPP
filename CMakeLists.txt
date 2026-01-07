@@ -38,6 +38,7 @@ option(BUILD_LICHENS_CPP_TESTS "Build the tests tree." ON)
 set(SOURCES
     src/fileutil.cpp
     src/stringutil.cpp
+    src/timeutil.cpp
     src/uuid.cpp
 )
 
@@ -92,6 +93,8 @@ if(BUILD_LICHENS_CPP_LAUNCHER)
     message(STATUS "Building Lichens-CPP Launcher module.")
     list(APPEND SOURCES 
         src/launcher/LaunchProcess.cpp
+        src/launcher/MainLoopHelper.cpp
+        src/launcher/PeriodicTask.cpp
     )
     add_definitions(-DBUILD_LICHENS_CPP_LAUNCHER)
 endif()
