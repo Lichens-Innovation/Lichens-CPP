@@ -1,7 +1,7 @@
 /*
  * Created on Wed Nov 12 2025
  *
- * Copyright (c) 2025 PointLAZ Inc. All rights reserved.
+ * Copyright (c) 2025 Lichens Inc. All rights reserved.
  */
 
 #include "LichensCPP/timeutil.h"
