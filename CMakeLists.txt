@@ -152,6 +152,7 @@ if(BUILD_LICHENS_CPP_TESTS)
 
     add_executable(test_lichens_cpp
         tests/main.cpp
+        tests/test_bimap.cpp
         tests/test_ring_buffer.cpp
         tests/test_scope_action.cpp
         tests/test_stringutil.cpp
