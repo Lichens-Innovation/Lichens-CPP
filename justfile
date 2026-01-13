@@ -33,3 +33,4 @@ test TEST_NAME: build-test
 
 clean:
     rm -rf build
+    rm -rf examples/*/build
