@@ -112,10 +112,22 @@ namespace LichensCPP
             return forward_map.at(key);
         }
 
+        template <typename U = T1, typename = std::enable_if_t<std::is_same_v<U, std::string>>>
+        const T2& operator[](const char* key) const
+        {
+            return forward_map.at(std::string(key));
+        }
+
         template <typename U = T2, typename = std::enable_if_t<!std::is_same_v<T1, U>>>
         const T1& operator[](const T2 &value) const
         {
             return reverse_map.at(value);
+        }
+
+        template <typename U = T2, typename = std::enable_if_t<std::is_same_v<U, std::string> && !std::is_same_v<T1, std::string>>>
+        const T1& operator[](const char* value) const
+        {
+            return reverse_map.at(std::string(value));
         }
 
         iterator begin() noexcept

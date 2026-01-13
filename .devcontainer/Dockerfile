@@ -22,6 +22,7 @@ RUN apt-get update && \
         llvm \
         lld \
         git \
+        jq \
         libssl-dev \
         ninja-build \
         openssl \
