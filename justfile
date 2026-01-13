@@ -16,6 +16,9 @@ build-release:
     mkdir -p build/release
     cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -DBUILD_LICHENS_CPP_TESTS=OFF && cmake --build build/release
 
+test-ci: build-test
+    ./build/test/test_lichens_cpp --gtest_output="json:TestsResults.json"
+
 test-all: build-test
     ./build/test/test_lichens_cpp
 

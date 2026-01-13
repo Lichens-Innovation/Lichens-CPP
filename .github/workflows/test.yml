@@ -1,0 +1,58 @@
+name: Run Tests in Docker
+    
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t lichens_cpp_test_image -f .devcontainer/Dockerfile .
+
+      - name: Run Docker
+        run: docker run -d --name test_container lichens_cpp_test_image tail -f /dev/null
+        
+      - name: Copy into Docker
+        run: docker cp ${{github.workspace}}/. test_container:/workspace
+
+      - name: Change ownship
+        run: docker exec test_container sudo chown -R 1010:1010 /workspace
+      
+      - name: Run test
+        run: docker exec --user 1010:1010 test_container /bin/bash -c "cd /workspace && just test_ci && ./TestsResultsParser.sh"
+
+      - name: Copy JSON Test Results
+        run: docker cp test_container:/workspace/TestsResults.json ${{github.workspace}}/TestsResults.json
+      
+      - name: Copy Markdown Test Results
+        run: docker cp test_container:/workspace/TestsResults.md ${{github.workspace}}/TestsResults.md
+
+      - name: Stop Docker
+        run: docker stop test_container
+
+      - name: Upload JSON Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-json-report
+          path: TestsResults.json
+      
+      - name: Upload Markdown Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-md-report
+          path: TestsResults.md
+      
+      - name: Parse and Display Test Results
+        run: cat TestsResults.md >> $GITHUB_STEP_SUMMARY
