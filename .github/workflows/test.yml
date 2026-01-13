@@ -31,7 +31,7 @@ jobs:
         run: docker exec test_container sudo chown -R 1010:1010 /workspace
       
       - name: Run test
-        run: docker exec --user 1010:1010 test_container /bin/bash -c "cd /workspace && just test_ci && ./TestsResultsParser.sh"
+        run: docker exec --user 1010:1010 test_container /bin/bash -c "cd /workspace && just test-ci && ./TestsResultsParser.sh"
 
       - name: Copy JSON Test Results
         run: docker cp test_container:/workspace/TestsResults.json ${{github.workspace}}/TestsResults.json
