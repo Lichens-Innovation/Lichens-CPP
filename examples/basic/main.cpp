@@ -13,6 +13,14 @@
 #include <LichensCPP/log/Logger.h>
 #include <LichensCPP/log/LoggerHelper.h>
 
+/**
+ * @brief Prints usage and available command-line options to standard output.
+ *
+ * Prints the program name followed by a short list of supported options:
+ * `--help`, `--version`, and `--message <msg>`.
+ *
+ * @param app_name Name of the executable (typically `argv[0]`) used in the usage line.
+ */
 void print_help(const std::string& app_name)
 {
     std::cout << "Usage: " << app_name << " [options]\n";
@@ -22,6 +30,12 @@ void print_help(const std::string& app_name)
     std::cout << "  --message <msg>          Log a message to the logger\n";
 }
 
+/**
+ * @brief Configures and initializes the global logger for the application.
+ *
+ * Adds a console logger at TRACE level, adds a file logger that writes to ./demo_app.log at WARNING level,
+ * and initializes the logger with the name "demo_app".
+ */
 void init_logger()
 {
     LichensCPP::Logger::instance()
@@ -30,6 +44,19 @@ void init_logger()
         .init("demo_app");
 }
 
+/**
+ * @brief Program entry point that initializes logging, processes command-line options, logs messages, and exits.
+ *
+ * This function sets up the application's logger, emits startup and shutdown warnings, and handles the following
+ * command-line options:
+ * - `--message <msg>`: logs `<msg>` at INFO level.
+ * - `--version`: prints the application version and exits.
+ * - `--help` or `-h`: prints usage information and exits.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line argument strings; argv[0] is the program name used for help output.
+ * @return int `0` on successful completion (including after handling `--version` or `--help`). 
+ */
 int main(int argc, char* argv[])
 {
     init_logger();
