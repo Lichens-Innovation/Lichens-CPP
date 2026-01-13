@@ -45,13 +45,13 @@ jobs:
       - name: Upload JSON Test Report
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-json-report
+          name: gtest-json-report
           path: TestsResults.json
       
       - name: Upload Markdown Test Report
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-md-report
+          name: gtest-md-report
           path: TestsResults.md
       
       - name: Parse and Display Test Results
