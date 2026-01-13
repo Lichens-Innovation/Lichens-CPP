@@ -1,4 +1,5 @@
 build/**
+examples/**/build/**
 CMakeFiles/**
 CMakeCache.txt
 cmake_install.cmake

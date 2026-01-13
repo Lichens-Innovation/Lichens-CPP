@@ -4,6 +4,12 @@ help:
 open:
     code .
 
+example-basic:
+    cd examples/basic && mkdir -p build && cmake -S . -B build && cmake --build build && ./build/ExampleBasic
+
+examples: example-basic
+
+
 build:
     mkdir -p build/debug
     cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_LICHENS_CPP_TESTS=OFF  && cmake --build build/debug
