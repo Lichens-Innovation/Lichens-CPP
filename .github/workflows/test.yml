@@ -13,8 +13,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    # Skip if it's a push to a branch that has an open PR
-    if: github.event_name != 'push' || github.event.pull_request == null
+    concurrency:
+      group: test-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout Code
