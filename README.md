@@ -9,9 +9,7 @@ https://github.com/casey/just tools.
 
 ## Sharing source
 
-The source code should remain proprietary to Lichens, some right to use and modify can be 
-provided to clients upon contract and should be verified before handing this source code to other
-entity.
+The source code is copyright to Lichens, but it distributed as MIT license and user can use under the MIT license term.
 
 ## Contributions Rules
 
