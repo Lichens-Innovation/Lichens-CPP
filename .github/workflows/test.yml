@@ -27,7 +27,7 @@ jobs:
       - name: Copy into Docker
         run: docker cp ${{github.workspace}}/. test_container:/workspace
 
-      - name: Change ownship
+      - name: Change ownership
         run: docker exec test_container sudo chown -R 1010:1010 /workspace
       
       - name: Run test
