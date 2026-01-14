@@ -57,5 +57,8 @@ int main(int argc, char* argv[])
     LOG_ERROR("This is an error message");
 
     LOG_WARNING("**** Demo app quitting");
+
+    LOG_SHUTDOWN();
+    
     return 0;
 }
