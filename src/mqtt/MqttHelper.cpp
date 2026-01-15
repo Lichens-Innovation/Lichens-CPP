@@ -257,8 +257,7 @@ namespace LichensCPP
         {
             try
             {
-                auto tok = mqtt_client->publish(topic, message, size);
-                tok->set_action_callback(publish_listener);
+                mqtt_client->publish(topic, message, size, qos, false, nullptr, publish_listener);
             }
             catch (const mqtt::exception &e)
             {
