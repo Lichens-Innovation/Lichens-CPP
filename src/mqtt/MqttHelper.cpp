@@ -32,18 +32,56 @@ namespace LichensCPP
         CallbackMqttMessage callback;
     };
 
+    class PublishActionListener : public virtual mqtt::iaction_listener
+    {
+    public:
+        PublishActionListener()
+        {
+        }
+
+        std::string get_topic(const mqtt::token &tok)
+        {
+            const auto topics_ptr = tok.get_topics();
+            if (topics_ptr != nullptr && !topics_ptr->empty())
+            {
+                std::string result;
+                for (size_t i = 0u; i < topics_ptr->size(); ++i)
+                {
+                    if (i > 0u)
+                    {
+                        result += ", ";
+                    }
+                    result += (*topics_ptr)[i];
+                }
+                return result;
+            }
+            return "???";
+        }
+
+        void on_failure(const mqtt::token &tok) override
+        {
+            LOG_ERROR_S("Failed to publish message to topic ", get_topic(tok));
+        }
+
+        void on_success(const mqtt::token &tok) override
+        {
+            LOG_INFO_F("Published message to topic %s", get_topic(tok).c_str());
+        }
+    };
+
     struct MqttHelper::MqttHelperPrivate
     {
         std::string mqtt_name;
         std::string mqtt_broker;
         int mqtt_port;
         int qos;
+        PublishActionListener publish_listener;
         size_t subscribe_id;
         std::shared_ptr<mqtt::async_client> mqtt_client;
         std::unordered_map<size_t, Subscription> subscriptions;
 
         MqttHelperPrivate(const std::string &name, const std::string &broker, int port)
-            : mqtt_name(name), mqtt_broker(broker), mqtt_port(port), qos(1), subscribe_id(1u), mqtt_client(nullptr), subscriptions()
+            : mqtt_name(name), mqtt_broker(broker), mqtt_port(port), qos(1), publish_listener(), subscribe_id(1u), mqtt_client(nullptr), subscriptions()
         {
             const std::string address = "tcp://" + mqtt_broker + ":" + std::to_string(mqtt_port);
             LOG_INFO_F("Creating client to MQTT broker at %s with name: %s", address.c_str(), mqtt_name.c_str());
@@ -219,8 +257,8 @@ namespace LichensCPP
         {
             try
             {
-                mqtt_client->publish(topic, message, size)->wait();
-                LOG_INFO_F("Published message to topic %s", topic.c_str());
+                auto tok = mqtt_client->publish(topic, message, size);
+                tok->set_action_callback(publish_listener);
             }
             catch (const mqtt::exception &e)
             {
