@@ -6,6 +6,7 @@
 
 #include "LichensCPP/mqtt/MqttHelper.h"
 
+#include <chrono>
 #include <cstdlib>
 #include <regex>
 #include <unordered_map>
@@ -35,11 +36,10 @@ namespace LichensCPP
     class PublishActionListener : public virtual mqtt::iaction_listener
     {
     public:
-        PublishActionListener()
-        {
-        }
+        PublishActionListener() = default;
+        ~PublishActionListener() override = default;
 
-        std::string get_topic(const mqtt::token &tok)
+        std::string get_topic(const mqtt::token &tok) const
         {
             const auto topics_ptr = tok.get_topics();
             if (topics_ptr != nullptr && !topics_ptr->empty())
@@ -60,12 +60,12 @@ namespace LichensCPP
 
         void on_failure(const mqtt::token &tok) override
         {
-            LOG_ERROR_S("Failed to publish message to topic ", get_topic(tok));
+            LOG_ERROR_S("Failed to publish message to topic: ", get_topic(tok));
         }
 
         void on_success(const mqtt::token &tok) override
         {
-            LOG_INFO_F("Published message to topic %s", get_topic(tok).c_str());
+            LOG_INFO_S("Published message to topic: ", get_topic(tok));
         }
     };
 
@@ -81,7 +81,14 @@ namespace LichensCPP
         std::unordered_map<size_t, Subscription> subscriptions;
 
         MqttHelperPrivate(const std::string &name, const std::string &broker, int port)
-            : mqtt_name(name), mqtt_broker(broker), mqtt_port(port), qos(1), publish_listener(), subscribe_id(1u), mqtt_client(nullptr), subscriptions()
+            : mqtt_name(name), 
+              mqtt_broker(broker), 
+              mqtt_port(port), 
+              qos(1), 
+              publish_listener(), 
+              subscribe_id(1u), 
+              mqtt_client(nullptr), 
+              subscriptions()
         {
             const std::string address = "tcp://" + mqtt_broker + ":" + std::to_string(mqtt_port);
             LOG_INFO_F("Creating client to MQTT broker at %s with name: %s", address.c_str(), mqtt_name.c_str());
@@ -213,7 +220,12 @@ namespace LichensCPP
             {
                 if (mqtt_client && mqtt_client->is_connected())
                 {
-                    mqtt_client->disconnect()->wait();
+                    auto tok = mqtt_client->disconnect(std::chrono::seconds(5));
+                    tok->wait();
+                    if(tok->get_return_code() != mqtt::SUCCESS)
+                    {
+                        LOG_WARNING_S("MQTT disconnection returned code: ", tok->get_return_code());
+                    }
                     LOG_INFO_F("Disconnected as %s from MQTT broker at %s:%d", mqtt_name.c_str(), mqtt_broker.c_str(), mqtt_port);
                 }
             }
