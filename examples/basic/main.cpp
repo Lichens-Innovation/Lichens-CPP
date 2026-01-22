@@ -12,6 +12,7 @@
 
 #include <LichensCPP/log/Logger.h>
 #include <LichensCPP/log/LoggerHelper.h>
+#include <LichensCPP/scope_action.h>
 
 void print_help(const std::string& app_name)
 {
@@ -33,6 +34,9 @@ void init_logger()
 int main(int argc, char* argv[])
 {
     init_logger();
+    LichensCPP::ScopeAction logger_shutdown_action([]() {
+        LOG_SHUTDOWN();
+    });
     LOG_WARNING("**** Demo app starting");
     LOG_FLUSH();
 
@@ -57,8 +61,6 @@ int main(int argc, char* argv[])
     LOG_ERROR("This is an error message");
 
     LOG_WARNING("**** Demo app quitting");
-
-    LOG_SHUTDOWN();
     
     return 0;
 }
