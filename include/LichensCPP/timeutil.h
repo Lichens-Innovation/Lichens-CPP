@@ -21,6 +21,12 @@ namespace LichensCPP
     float time_sec(uint64_t t);
     float time_msec(uint64_t t);
     float time_usec(uint64_t t);
+    float time_nsec(uint64_t t);
+
+    uint64_t from_sec(float seconds);
+    uint64_t from_msec(float milliseconds);
+    uint64_t from_usec(float microseconds);
+    uint64_t from_nsec(float nanoseconds);
 
     uint64_t frequency_to_period(float frequency);
 
