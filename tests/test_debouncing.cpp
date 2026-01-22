@@ -7,13 +7,14 @@
  * Created on 2026-01-22
  */
 
-`#include` <gtest/gtest.h>
-`#include` <thread>
-`#include` <chrono>
-`#include` <vector>
-`#include` <stdexcept>
-`#include` "LichensCPP/debouncing.h"
-`#include` "LichensCPP/unused.h"
+#include <gtest/gtest.h>
+#include <thread>
+#include <chrono>
+#include <vector>
+#include <stdexcept>
+#include "LichensCPP/debouncing.h"
+#include "LichensCPP/unused.h"
+
 using namespace LichensCPP;
 
 const uint64_t TOO_LONG_DELAY = from_sec(1);
