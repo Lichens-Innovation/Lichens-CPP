@@ -259,6 +259,7 @@ if(BUILD_LICHENS_CPP_TESTS)
         tests/test_ring_buffer.cpp
         tests/test_scope_action.cpp
         tests/test_stringutil.cpp
+        tests/test_thread_safe_queue.cpp
         tests/config/test_Config.cpp
         tests/config/test_ConfigValue.cpp
         tests/log/test_Logger.cpp
