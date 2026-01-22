@@ -9,3 +9,7 @@
 * Example basic now shutdown logger properly at the end of execution
 * MQTT helper nous use publisher listener to avoid dead lock if sending message from rx handler.
 * Add debouncing 
+
+## Version 0.3
+
+* Add thread safe queue
