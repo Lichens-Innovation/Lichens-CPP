@@ -105,7 +105,6 @@ namespace LichensCPP
         }
         return static_cast<uint64_t>(nanoseconds);
     }
-    }
 
     uint64_t frequency_to_period(float frequency)
     {

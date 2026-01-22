@@ -57,7 +57,7 @@ TEST(Debouncing, CallsWithinMaxNbCallsExecute)
         received_values.push_back(value);
     }, TOO_LONG_DELAY, 5u);
 
-    // First 5 calls should all execute
+    // First 5 calls only last should execute
     for (int i = 0; i < 5; ++i)
     {
         debouncer.call(i);
