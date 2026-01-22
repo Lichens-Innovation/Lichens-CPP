@@ -65,6 +65,31 @@ namespace LichensCPP
         return static_cast<float>(t) / 1e3f;
     }
 
+    float time_nsec(uint64_t t)
+    {
+        return static_cast<float>(t);
+    }
+
+    uint64_t from_sec(float seconds)
+    {
+        return static_cast<uint64_t>(seconds * 1e9f);
+    }
+
+    uint64_t from_msec(float milliseconds)
+    {
+        return static_cast<uint64_t>(milliseconds * 1e6f);
+    }
+
+    uint64_t from_usec(float microseconds)
+    {
+        return static_cast<uint64_t>(microseconds * 1e3f);
+    }
+
+    uint64_t from_nsec(float nanoseconds)
+    {
+        return static_cast<uint64_t>(nanoseconds);
+    }
+
     uint64_t frequency_to_period(float frequency)
     {
         if (frequency <= 0.0f)
