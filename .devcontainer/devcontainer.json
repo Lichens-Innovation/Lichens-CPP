@@ -10,7 +10,8 @@
                 "ms-vscode.cmake-tools",
                 "formulahendry.code-runner",
                 "ms-vscode.cpptools-extension-pack",
-                "doi.fileheadercomment"
+                "doi.fileheadercomment",
+                "anthropic.claude-code"
             ],
             "settings": {
                 "cmake.configureOnOpen": true,
@@ -45,8 +46,11 @@
         }
     },
     "mounts": [
-        "source=${localWorkspaceFolder},target=/workspace,type=bind"
+        "source=${localWorkspaceFolder},target=/workspace,type=bind",
+        "source=lichens-cpp-claude-devcontainer-auth,target=/home/devuser/.claude,type=volume",
+        "source=lichens-cpp-claude-devcontainer-json,target=/home/devuser/.claude.json,type=volume"
     ],
+    "postStartCommand": "sudo chown -R devuser:devuser /home/devuser/.claude /home/devuser/.claude.json",
     "workspaceFolder": "/workspace",
     "remoteUser": "devuser"
   }
