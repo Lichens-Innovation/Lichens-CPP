@@ -23,7 +23,7 @@ namespace LichensCPP
     class Debouncing
     {
     public:
-        Debouncing(CallbackType callback, uint64_t max_interval = 1e9, uint32_t max_nb_calls = 10u)
+        Debouncing(CallbackType callback, uint64_t max_interval = 1'000'000'000u, uint32_t max_nb_calls = 10u)
             : m_callback(std::move(callback)),
             m_max_interval(max_interval),
             m_max_nb_calls(max_nb_calls),

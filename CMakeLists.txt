@@ -133,10 +133,17 @@ endif()
 if(BUILD_LICHENS_CPP_LAUNCHER)
     message(STATUS "Building Lichens-CPP Launcher module.")
     list(APPEND SOURCES 
-        src/launcher/LaunchProcess.cpp
         src/launcher/MainLoopHelper.cpp
         src/launcher/PeriodicTask.cpp
     )
+    # LaunchProcess uses POSIX process APIs
+    if(WIN32)
+        message(STATUS "Lichens-CPP LaunchProcess is not supported on Windows, it is excluded from the Launcher module.")
+    else()
+        list(APPEND SOURCES
+            src/launcher/LaunchProcess.cpp
+        )
+    endif()
     list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_LAUNCHER)
 endif()
 
@@ -210,6 +217,7 @@ if(BUILD_LICHENS_CPP_TESTS)
         tests/test_stringutil.cpp
         tests/config/test_Config.cpp
         tests/config/test_ConfigValue.cpp
+        tests/log/test_Logger.cpp
     )
 
     target_compile_definitions(test_lichens_cpp PRIVATE ${MODULE_DEFINITIONS} BUILD_LICHENS_CPP_TESTS)

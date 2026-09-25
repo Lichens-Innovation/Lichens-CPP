@@ -6,6 +6,12 @@
 
 #pragma once
 
+#ifdef _WIN32
+    #error "LichensCPP/launcher/LaunchProcess.h is not supported on Windows. MainLoopHelper and PeriodicTask are available."
+#endif
+
+#include <sys/types.h>
+
 #include <string>
 #include <vector>
 

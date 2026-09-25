@@ -26,8 +26,8 @@ void print_help(const std::string& app_name)
 void init_logger()
 {
     LichensCPP::Logger::instance()
-        .add_console_logger(LichensCPP::LogLevel::TRACE)
-        .add_file_logger("./", "demo_app.log", LichensCPP::LogLevel::WARNING)
+        .add_console_logger(LichensCPP::LogLevel::Trace)
+        .add_file_logger("./", "demo_app.log", LichensCPP::LogLevel::Warning)
         .init("demo_app");
 }
 

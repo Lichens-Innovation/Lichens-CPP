@@ -9,7 +9,7 @@ include(FetchContent)
 
 # Select what we want to build from Lichens-CPP
 set(BUILD_LICHENS_CPP_CONFIG OFF CACHE BOOL "Build Lichens-CPP configuration support" FORCE)
-set(BUILD_LICHENS_CPP_LAUNCHER OFF CACHE BOOL "Build Lichens-CPP launcher" FORCE)
+set(BUILD_LICHENS_CPP_LAUNCHER ON CACHE BOOL "Build Lichens-CPP launcher")
 set(BUILD_LICHENS_CPP_MQTT OFF CACHE BOOL "Build Lichens-CPP MQTT support" FORCE)
 set(BUILD_LICHENS_CPP_TESTS OFF CACHE BOOL "Build Lichens-CPP tests" FORCE)
 

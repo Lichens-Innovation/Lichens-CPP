@@ -9,8 +9,12 @@
 
 #pragma once
 
+#include <cstddef>
+#include <initializer_list>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 
 namespace LichensCPP
 {
@@ -84,11 +88,11 @@ namespace LichensCPP
 
         bool contains_key(const T1 &key) const
         {
-            return forward_map.count(key);
+            return forward_map.count(key) != 0;
         }
         bool contains_value(const T2 &value) const
         {
-            return reverse_map.count(value);
+            return reverse_map.count(value) != 0;
         }
 
         size_t size() const

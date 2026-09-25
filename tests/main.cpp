@@ -17,7 +17,7 @@ public:
     void SetUp() override {
         // runs once before all tests
         LichensCPP::Logger::instance()
-            .add_console_logger(LichensCPP::LogLevel::DEBUG)
+            .add_console_logger(LichensCPP::LogLevel::Debug)
             .init("test_logger");
     }
 

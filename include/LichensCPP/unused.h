@@ -10,6 +10,10 @@
 
 #define UNUSED(x) (void)(x)
 
+inline void unused_list()
+{
+}
+
 template <class T, class... Ts>
 inline void unused_list(const T &t, const Ts &...ts)
 {

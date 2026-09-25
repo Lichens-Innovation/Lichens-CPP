@@ -11,12 +11,16 @@
 #include <csignal>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 #include "LichensCPP/log/LoggerHelper.h"
 
-std::atomic<bool> running{true};
-std::condition_variable cv;
-std::mutex mtx;
+namespace
+{
+    std::atomic<bool> running{true};
+    std::condition_variable cv;
+    std::mutex mtx;
+} // namespace
 
 namespace LichensCPP
 {
