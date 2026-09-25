@@ -22,3 +22,4 @@
 * `LogLevel` values are renamed to `Trace`, `Debug`, `Info`, `Warning`, `Error` and `Fatal` so they do not collide with Windows macros. The logging macros keep their names. On non-Windows platforms the old uppercase names remain as deprecated aliases, on Windows only the new names exist
 * LaunchProcess is not available on Windows: it is excluded from the build and including its header is a compile error. MainLoopHelper and PeriodicTask are available on Windows
 * All public headers compile without warnings under strict consumer flags (MSVC `/W4 /WX /permissive- /Zc:preprocessor /Zc:__cplusplus`, GCC/Clang `-Wall -Wextra -pedantic -Werror`)
+* CI builds Lichens-CPP on Windows (MSVC, `/W4 /WX`) and runs its test suite there

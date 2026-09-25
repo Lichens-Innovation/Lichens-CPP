@@ -59,3 +59,25 @@ jobs:
       
       - name: Parse and Display Test Results
         run: cat TestsResults.md >> $GITHUB_STEP_SUMMARY
+
+  # Lichens-CPP as the top-level project on MSVC, so its /W4 /WX flags apply.
+  # MQTT is off (Paho MQTT is find-only) and the other dependencies are always fetched, even if installed on the runner.
+  test-windows:
+    name: Tests (windows-latest, MSVC)
+    runs-on: windows-latest
+    concurrency:
+      group: test-windows-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DBUILD_LICHENS_CPP_MQTT=OFF -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run test
+        run: ./build/Release/test_lichens_cpp.exe

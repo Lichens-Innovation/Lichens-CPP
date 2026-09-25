@@ -5,7 +5,10 @@
  */
 
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "LichensCPP/config/ConfigValue.h"
 
@@ -264,8 +267,16 @@ TEST(ConfigValueTest, OstreamOutput)
 
     std::stringstream ss;
     ss << config_value;
-    // NOTE: this is fragile since it can change based on unordered_map order
-    EXPECT_EQ(ss.str(), "{\"b\": {\"c\": 2}, \"d\": [3, 4], \"a\": 1}");
+    // Object keys come out in unordered_map order, which differs between standard libraries,
+    // so accept the entries in any order
+    std::vector<std::string> entries = {"\"a\": 1", "\"b\": {\"c\": 2}", "\"d\": [3, 4]"};
+    std::sort(entries.begin(), entries.end());
+    std::vector<std::string> accepted;
+    do
+    {
+        accepted.push_back("{" + entries[0] + ", " + entries[1] + ", " + entries[2] + "}");
+    } while (std::next_permutation(entries.begin(), entries.end()));
+    EXPECT_NE(std::find(accepted.begin(), accepted.end(), ss.str()), accepted.end()) << "Actual: " << ss.str();
 }
 
 TEST(ConfigValueTest, ObjectMerge)
