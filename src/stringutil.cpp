@@ -112,6 +112,8 @@ namespace LichensCPP
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1};
 
         size_t len = data.size();
+        if (len == 0u)
+            return {};
         if (len % 4u != 0u)
             throw std::runtime_error("Invalid base64 data length");
 

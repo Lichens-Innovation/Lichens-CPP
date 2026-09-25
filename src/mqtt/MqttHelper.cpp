@@ -251,17 +251,17 @@ namespace LichensCPP
             return id;
         }
 
-        void unsubscribe(size_t subscribe_id)
+        void unsubscribe(size_t id)
         {
-            auto it = subscriptions.find(subscribe_id);
+            auto it = subscriptions.find(id);
             if (it == subscriptions.end())
             {
-                LOG_INFO_F("No subscription found with ID: %zu", subscribe_id);
+                LOG_INFO_F("No subscription found with ID: %zu", id);
                 return;
             }
             
             mqtt_client->unsubscribe(it->second.topic)->wait();
-            LOG_TRACE_F("Unsubscribed from topic: %s", it->second.topic);
+            LOG_TRACE_F("Unsubscribed from topic: %s", it->second.topic.c_str());
             subscriptions.erase(it);            
         }
 
