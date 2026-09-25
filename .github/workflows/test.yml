@@ -76,8 +76,15 @@ jobs:
       - name: Configure
         run: cmake -S . -B build -DBUILD_LICHENS_CPP_MQTT=OFF -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
 
-      - name: Build
+      # Debug too: the debug runtime's checked iterators catch out-of-range access that Release lets through
+      - name: Build (Debug)
+        run: cmake --build build --config Debug
+
+      - name: Run test (Debug)
+        run: ./build/Debug/test_lichens_cpp.exe
+
+      - name: Build (Release)
         run: cmake --build build --config Release
 
-      - name: Run test
+      - name: Run test (Release)
         run: ./build/Release/test_lichens_cpp.exe
