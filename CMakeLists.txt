@@ -18,15 +18,39 @@ message(STATUS "Lichens CPP using CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    add_compile_options(-Wall -Wextra -Werror -pedantic -Wuninitialized -Wunused-variable)
-elseif (MSVC)
-    add_compile_options(/W4 /WX /we4101)
-else()
-    message(WARNING "Compiler not recognized, default warning flags will be used.")
-endif()
+# Warning and source encoding flags, applied only to Lichens-CPP's own targets.
+# MSVC is checked first so clang-cl gets MSVC-style flags.
+# Warnings are errors only when Lichens-CPP is the top-level project.
+function(lichens_cpp_set_compile_options target)
+    if (MSVC)
+        target_compile_options(${target} PRIVATE /W4 /we4101 /utf-8)
+        if (lichens_cpp_project_IS_TOP_LEVEL)
+            target_compile_options(${target} PRIVATE /WX)
+        endif()
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        target_compile_options(${target} PRIVATE -Wall -Wextra -pedantic -Wuninitialized -Wunused-variable)
+        if (lichens_cpp_project_IS_TOP_LEVEL)
+            target_compile_options(${target} PRIVATE -Werror)
+        endif()
+    else()
+        message(WARNING "Compiler not recognized, default warning flags will be used.")
+    endif()
+endfunction()
 
 include(FetchContent)
+
+# Library linkage. BUILD_SHARED_LIBS is intentionally ignored so that a consumer's
+# global setting does not change how Lichens-CPP is built.
+if(WIN32)
+    set(LICHENS_CPP_BUILD_SHARED_DEFAULT OFF)
+else()
+    set(LICHENS_CPP_BUILD_SHARED_DEFAULT ON)
+endif()
+option(LICHENS_CPP_BUILD_SHARED "Build Lichens-CPP as a shared library (default: static on Windows, shared elsewhere)." ${LICHENS_CPP_BUILD_SHARED_DEFAULT})
+
+# Fetched dependencies are always static, whatever the consumer's BUILD_SHARED_LIBS is.
+# This normal variable only applies to this directory and the fetched subprojects.
+set(BUILD_SHARED_LIBS OFF)
 
 # CMake options to enable/disable modules
 set(BUILD_LICHENS_CPP_LOG ON CACHE BOOL "Build the Log module.")
@@ -46,15 +70,32 @@ set(LIBRARY_USED
 )
 
 set(INCLUDES_PUBLIC
-    include
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 set(INCLUDES_PRIVATE
 )
 
+set(MODULE_DEFINITIONS
+)
+
+# fmt and nlohmann_json: use an installed copy if found, otherwise fetch
+FetchContent_Declare(
+    fmt
+    URL https://github.com/fmtlib/fmt/archive/refs/tags/11.1.4.tar.gz
+    # spdlog 1.15 with an external fmt requires fmt 11 or newer
+    FIND_PACKAGE_ARGS 11 GLOBAL
+)
+FetchContent_Declare(
+    nlohmann_json
+    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+    FIND_PACKAGE_ARGS GLOBAL
+)
+
 # spdlog
 if(BUILD_LICHENS_CPP_LOG)
-    find_package(fmt REQUIRED)
+    FetchContent_MakeAvailable(fmt)
+    set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "" FORCE)
     set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
     set(SPDLOG_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -72,12 +113,12 @@ if(BUILD_LICHENS_CPP_LOG)
     list(APPEND SOURCES 
         src/log/Logger.cpp
     )
-    add_definitions(-DBUILD_LICHENS_CPP_LOG)
+    list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_LOG)
 endif()
 
 if(BUILD_LICHENS_CPP_CONFIG)
     message(STATUS "Building Lichens-CPP Config module.")
-    find_package(nlohmann_json REQUIRED)
+    FetchContent_MakeAvailable(nlohmann_json)
     list(APPEND SOURCES 
         src/config/AppConfig.cpp
         src/config/Config.cpp
@@ -86,7 +127,7 @@ if(BUILD_LICHENS_CPP_CONFIG)
     list(APPEND LIBRARY_USED
         nlohmann_json::nlohmann_json
     )
-    add_definitions(-DBUILD_LICHENS_CPP_CONFIG)
+    list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_CONFIG)
 endif()
 
 if(BUILD_LICHENS_CPP_LAUNCHER)
@@ -96,7 +137,7 @@ if(BUILD_LICHENS_CPP_LAUNCHER)
         src/launcher/MainLoopHelper.cpp
         src/launcher/PeriodicTask.cpp
     )
-    add_definitions(-DBUILD_LICHENS_CPP_LAUNCHER)
+    list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_LAUNCHER)
 endif()
 
 if(BUILD_LICHENS_CPP_MQTT)
@@ -111,13 +152,24 @@ if(BUILD_LICHENS_CPP_MQTT)
     list(APPEND LIBRARY_USED
         PahoMqttCpp::paho-mqttpp3
     )
-    add_definitions(-DBUILD_LICHENS_CPP_MQTT)
+    list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_MQTT)
 endif()
 
 # Library source files
-add_library(lichens_cpp SHARED 
+if(LICHENS_CPP_BUILD_SHARED)
+    set(LICHENS_CPP_LIBRARY_TYPE SHARED)
+else()
+    set(LICHENS_CPP_LIBRARY_TYPE STATIC)
+endif()
+add_library(lichens_cpp ${LICHENS_CPP_LIBRARY_TYPE}
     ${SOURCES}
 )
+# No export macros in the API, so export everything for a Windows DLL
+set_target_properties(lichens_cpp PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+target_compile_features(lichens_cpp PUBLIC cxx_std_17)
+target_compile_definitions(lichens_cpp PRIVATE ${MODULE_DEFINITIONS})
+lichens_cpp_set_compile_options(lichens_cpp)
 
 # add include directories
 target_include_directories(lichens_cpp 
@@ -134,13 +186,12 @@ target_link_libraries(lichens_cpp PRIVATE
 
 # Unit Tests
 if(BUILD_LICHENS_CPP_TESTS)
-    add_definitions(-DBUILD_LICHENS_CPP_TESTS)
     message(STATUS "Building Lichens-CPP tests.")
 
     # GoogleTest dependencies
     FetchContent_Declare(
         googletest
-        URL https://github.com/google/googletest/archive/refs/heads/main.zip
+        URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -161,7 +212,9 @@ if(BUILD_LICHENS_CPP_TESTS)
         tests/config/test_ConfigValue.cpp
     )
 
-    include_directories(${GTEST_INCLUDE_DIRS})
+    target_compile_definitions(test_lichens_cpp PRIVATE ${MODULE_DEFINITIONS} BUILD_LICHENS_CPP_TESTS)
+    lichens_cpp_set_compile_options(test_lichens_cpp)
+
     include(GoogleTest)
 
     target_link_libraries(test_lichens_cpp PRIVATE 

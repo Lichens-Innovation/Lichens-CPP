@@ -1,0 +1,42 @@
+name: Consumer Build
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  consumer:
+    name: Basic example (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    concurrency:
+      group: consumer-${{ matrix.os }}-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Build the basic example against this checkout instead of the remote repository
+      - name: Configure
+        run: cmake -S examples/basic -B build -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_SOURCE_DIR_LICHENS_CPP="${{ github.workspace }}"
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run (Linux)
+        if: runner.os != 'Windows'
+        run: ./build/ExampleBasic --message "Hello from CI"
+
+      - name: Run (Windows)
+        if: runner.os == 'Windows'
+        run: ./build/Release/ExampleBasic.exe --message "Hello from CI"
