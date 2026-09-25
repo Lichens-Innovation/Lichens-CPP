@@ -12,7 +12,14 @@
 #include <string>
 #include <version>
 
-#if __cplusplus >= 202002L
+// MSVC only reports the real language version in __cplusplus with /Zc:__cplusplus, _MSVC_LANG is always correct
+#ifdef _MSVC_LANG
+    #define LICHENS_CPP_CPLUSPLUS _MSVC_LANG
+#else
+    #define LICHENS_CPP_CPLUSPLUS __cplusplus
+#endif
+
+#if LICHENS_CPP_CPLUSPLUS >= 202002L
     #include <format>
 #endif
 
@@ -29,7 +36,12 @@
 
 namespace LichensCPP
 {
-#if __cplusplus < 202002L
+#if LICHENS_CPP_CPLUSPLUS < 202002L
+    // LOG_xxx_F("message") calls this with no args, the format is still interpreted as printf would
+#if defined(__GNUC__) || defined(__clang__)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+#endif
     template <typename... Args>
     std::string log_str_format(const char *format, Args... args)
     {
@@ -44,10 +56,13 @@ namespace LichensCPP
         if (static_cast<size_t>(written) >= buf.size())
         {
             // Output was truncated; only buf.size()-1 chars written + '\0'
-            written = buf.size() - 1;
+            written = static_cast<int>(buf.size() - 1);
         }
         return std::string(buf.data(), buf.data() + written);
     }
+#if defined(__GNUC__) || defined(__clang__)
+    #pragma GCC diagnostic pop
+#endif
 #endif
 
     template <typename... Args>
@@ -66,37 +81,37 @@ namespace LichensCPP
 #define LOG(level, message) LichensCPP::Logger::instance().log(level, message)
 
 #if LICHENS_LOG_MIN_LEVEL <= 0
-    #define LOG_TRACE(message) LOG(LichensCPP::LogLevel::TRACE, message)
+    #define LOG_TRACE(message) LOG(LichensCPP::LogLevel::Trace, message)
 #else
     #define LOG_TRACE(message) UNUSED(message)
 #endif
 #if LICHENS_LOG_MIN_LEVEL <= 1
-    #define LOG_DEBUG(message) LOG(LichensCPP::LogLevel::DEBUG, message)
+    #define LOG_DEBUG(message) LOG(LichensCPP::LogLevel::Debug, message)
 #else
     #define LOG_DEBUG(message) UNUSED(message)
 #endif
 #if LICHENS_LOG_MIN_LEVEL <= 2
-    #define LOG_INFO(message) LOG(LichensCPP::LogLevel::INFO, message)
+    #define LOG_INFO(message) LOG(LichensCPP::LogLevel::Info, message)
 #else
     #define LOG_INFO(message) UNUSED(message)
 #endif
 #if LICHENS_LOG_MIN_LEVEL <= 3
-    #define LOG_WARNING(message) LOG(LichensCPP::LogLevel::WARNING, message)
+    #define LOG_WARNING(message) LOG(LichensCPP::LogLevel::Warning, message)
 #else
     #define LOG_WARNING(message) UNUSED(message)
 #endif
 #if LICHENS_LOG_MIN_LEVEL <= 4
-    #define LOG_ERROR(message) LOG(LichensCPP::LogLevel::ERROR, message)
+    #define LOG_ERROR(message) LOG(LichensCPP::LogLevel::Error, message)
 #else
     #define LOG_ERROR(message) UNUSED(message)
 #endif
 #if LICHENS_LOG_MIN_LEVEL <= 5
-    #define LOG_FATAL(message) LOG(LichensCPP::LogLevel::FATAL, message)
+    #define LOG_FATAL(message) LOG(LichensCPP::LogLevel::Fatal, message)
 #else
     #define LOG_FATAL(message) UNUSED(message)
 #endif
 
-#if __cplusplus >= 202002L
+#if LICHENS_CPP_CPLUSPLUS >= 202002L
     // C++20 and newer
     #if LICHENS_LOG_MIN_LEVEL <= 0 
         #define LOG_TRACE_F(...)   LOG_TRACE(  std::format(__VA_ARGS__))
@@ -129,36 +144,36 @@ namespace LichensCPP
         #define LOG_FATAL_F(...)   UNUSED_LIST(__VA_ARGS__)
     #endif
 #else
-    // C++ 17 and lower, might need to reduce warning level to avoid empty __VA_ARGS__ warning
+    // C++ 17 and lower, the format string is the first of __VA_ARGS__
     #if LICHENS_LOG_MIN_LEVEL <= 0
-        #define LOG_TRACE_F(format, ...)   LOG_TRACE(  LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_TRACE_F(...)   LOG_TRACE(  LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_TRACE_F(format, ...)   UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_TRACE_F(...)   UNUSED_LIST(__VA_ARGS__)
     #endif
     #if LICHENS_LOG_MIN_LEVEL <= 1
-        #define LOG_DEBUG_F(format, ...)   LOG_DEBUG(  LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_DEBUG_F(...)   LOG_DEBUG(  LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_DEBUG_F(format, ...)   UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_DEBUG_F(...)   UNUSED_LIST(__VA_ARGS__)
     #endif
     #if LICHENS_LOG_MIN_LEVEL <= 2
-        #define LOG_INFO_F(format, ...)    LOG_INFO(   LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_INFO_F(...)    LOG_INFO(   LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_INFO_F(format, ...)    UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_INFO_F(...)    UNUSED_LIST(__VA_ARGS__)
     #endif
     #if LICHENS_LOG_MIN_LEVEL <= 3
-        #define LOG_WARNING_F(format, ...) LOG_WARNING(LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_WARNING_F(...) LOG_WARNING(LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_WARNING_F(format, ...) UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_WARNING_F(...) UNUSED_LIST(__VA_ARGS__)
     #endif
     #if LICHENS_LOG_MIN_LEVEL <= 4
-        #define LOG_ERROR_F(format, ...)   LOG_ERROR(  LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_ERROR_F(...)   LOG_ERROR(  LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_ERROR_F(format, ...)   UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_ERROR_F(...)   UNUSED_LIST(__VA_ARGS__)
     #endif
     #if LICHENS_LOG_MIN_LEVEL <= 5
-        #define LOG_FATAL_F(format, ...)   LOG_FATAL(  LichensCPP::log_str_format(format, ##__VA_ARGS__))
+        #define LOG_FATAL_F(...)   LOG_FATAL(  LichensCPP::log_str_format(__VA_ARGS__))
     #else
-        #define LOG_FATAL_F(format, ...)   UNUSED_LIST(format, ##__VA_ARGS__)
+        #define LOG_FATAL_F(...)   UNUSED_LIST(__VA_ARGS__)
     #endif
 #endif
 

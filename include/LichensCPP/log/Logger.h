@@ -14,12 +14,21 @@ namespace LichensCPP
 
 enum class LogLevel
 {
-    TRACE = 0,
-    DEBUG,
-    INFO,
-    WARNING,
-    ERROR,
-    FATAL
+    Trace = 0,
+    Debug,
+    Info,
+    Warning,
+    Error,
+    Fatal,
+#ifndef _WIN32
+    // Deprecated uppercase names, they collide with Windows macros (ERROR) so they do not exist on Windows
+    TRACE [[deprecated("Use LogLevel::Trace")]] = Trace,
+    DEBUG [[deprecated("Use LogLevel::Debug")]] = Debug,
+    INFO [[deprecated("Use LogLevel::Info")]] = Info,
+    WARNING [[deprecated("Use LogLevel::Warning")]] = Warning,
+    ERROR [[deprecated("Use LogLevel::Error")]] = Error,
+    FATAL [[deprecated("Use LogLevel::Fatal")]] = Fatal,
+#endif
 };
 
 class Logger

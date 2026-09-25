@@ -40,12 +40,12 @@ struct Logger::LoggerPrivate
     {
         switch(level)
         {
-            case LogLevel::TRACE:   return spdlog::level::trace;
-            case LogLevel::DEBUG:   return spdlog::level::debug;
-            case LogLevel::INFO:    return spdlog::level::info;
-            case LogLevel::WARNING: return spdlog::level::warn;
-            case LogLevel::ERROR:   return spdlog::level::err;
-            case LogLevel::FATAL:   return spdlog::level::critical;
+            case LogLevel::Trace:   return spdlog::level::trace;
+            case LogLevel::Debug:   return spdlog::level::debug;
+            case LogLevel::Info:    return spdlog::level::info;
+            case LogLevel::Warning: return spdlog::level::warn;
+            case LogLevel::Error:   return spdlog::level::err;
+            case LogLevel::Fatal:   return spdlog::level::critical;
         };
         return spdlog::level::info; // Default case
     }

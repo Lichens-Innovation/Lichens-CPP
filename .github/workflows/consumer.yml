@@ -26,9 +26,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Build the basic example against this checkout instead of the remote repository
+      # Build the basic example against this checkout instead of the remote repository,
+      # with strict consumer warning flags and the Launcher module on
       - name: Configure
-        run: cmake -S examples/basic -B build -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_SOURCE_DIR_LICHENS_CPP="${{ github.workspace }}"
+        run: cmake -S examples/basic -B build -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_SOURCE_DIR_LICHENS_CPP="${{ github.workspace }}" -DEXAMPLE_BASIC_STRICT_WARNINGS=ON -DBUILD_LICHENS_CPP_LAUNCHER=ON
 
       - name: Build
         run: cmake --build build --config Release
