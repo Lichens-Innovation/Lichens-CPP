@@ -91,3 +91,32 @@ TEST(LoggerTest, deprecatedUppercaseNamesEqualNewNames)
     #pragma GCC diagnostic pop
 #endif
 #endif
+
+#ifdef _WIN32
+// syslog does not exist on Windows, the API succeeds and only logs a warning to the other sinks
+TEST(LoggerTest, syslogLoggerIsNoOpOnWindows)
+{
+    const auto folder = std::filesystem::temp_directory_path() / "lichens_cpp_tests";
+    const std::string filename = "logger_test_syslog_windows.log";
+    std::error_code ec;
+    std::filesystem::remove(folder / filename, ec);
+
+    Logger logger;
+    Logger *returned = nullptr;
+    EXPECT_NO_THROW(returned = &logger.add_syslog_logger("logger_test_syslog", LogLevel::Trace));
+    EXPECT_EQ(returned, &logger);
+
+    logger.add_file_logger(folder.string(), filename, LogLevel::Trace).init("logger_test_syslog_windows");
+    EXPECT_NO_THROW(logger.add_syslog_logger("logger_test_syslog", LogLevel::Trace));
+    logger.log(LogLevel::Info, "info message");
+    logger.flush_all();
+
+    const std::string content = read_file(folder / filename);
+    EXPECT_NE(content.find("[info] info message"), std::string::npos);
+    // One warning for the request before init, one for the request after init
+    const std::string warning = "[warning] Syslog logger is not supported on this platform, it is ignored";
+    const auto first = content.find(warning);
+    ASSERT_NE(first, std::string::npos);
+    EXPECT_NE(content.find(warning, first + warning.size()), std::string::npos);
+}
+#endif

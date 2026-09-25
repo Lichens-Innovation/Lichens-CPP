@@ -15,7 +15,7 @@ namespace LichensCPP
     std::string& to_lower(std::string& str)
     {
         std::transform(str.begin(), str.end(), str.begin(),
-                       [](unsigned char c) { return std::tolower(c); });
+                       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
         return str;
     }
 
@@ -24,14 +24,14 @@ namespace LichensCPP
         std::string lower_str;
         lower_str.resize(str.size());
         std::transform(str.begin(), str.end(), lower_str.begin(),
-                       [](unsigned char c) { return std::tolower(c); });
+                       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
         return lower_str;
     }
 
     std::string& to_upper(std::string& str)
     {
         std::transform(str.begin(), str.end(), str.begin(),
-                       [](unsigned char c) { return std::toupper(c); });
+                       [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
         return str;
     }
 
@@ -40,7 +40,7 @@ namespace LichensCPP
         std::string upper_str;
         upper_str.resize(str.size());
         std::transform(str.begin(), str.end(), upper_str.begin(),
-                       [](unsigned char c) { return std::toupper(c); });
+                       [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
         return upper_str;
     }
 
@@ -85,9 +85,9 @@ namespace LichensCPP
 
         for (size_t i = 0u; i < len; i += 3u)
         {
-            uint32_t chunk = bytes[i] << 16;
+            uint32_t chunk = static_cast<uint32_t>(bytes[i]) << 16;
             if (i + 1 < len)
-                chunk |= bytes[i + 1] << 8;
+                chunk |= static_cast<uint32_t>(bytes[i + 1]) << 8;
             if (i + 2 < len)
                 chunk |= bytes[i + 2];
 
@@ -133,14 +133,14 @@ namespace LichensCPP
                 ((data[i + 2] == '=') ? 0 : (decode_table[static_cast<unsigned char>(data[i + 2])] << 6)) |
                 ((data[i + 3] == '=') ? 0 : decode_table[static_cast<unsigned char>(data[i + 3])]));
 
-            out_bytes[j++] = (val >> 16) & 0xFF;
+            out_bytes[j++] = static_cast<uint8_t>((val >> 16) & 0xFF);
             if (data[i + 2] != '=')
             {
-                out_bytes[j++] = (val >> 8) & 0xFF;
+                out_bytes[j++] = static_cast<uint8_t>((val >> 8) & 0xFF);
             }
             if (data[i + 3] != '=')
             {
-                out_bytes[j++] = val & 0xFF;
+                out_bytes[j++] = static_cast<uint8_t>(val & 0xFF);
             }
         }
 

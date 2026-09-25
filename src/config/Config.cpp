@@ -6,14 +6,13 @@
 
 #include "LichensCPP/config/Config.h"
 
-#include <algorithm>
-#include <cctype>
 #include <filesystem>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
 
 #include "LichensCPP/log/LoggerHelper.h"
+#include "LichensCPP/stringutil.h"
 
 namespace LichensCPP
 {
@@ -83,7 +82,7 @@ namespace LichensCPP
             }
             catch (const std::exception &e)
             {
-                LOG_ERROR_S("Failed to parse JSON config.");
+                LOG_ERROR_S("Failed to parse JSON config: ", e.what());
                 return false;
             }
             return true;
@@ -179,8 +178,7 @@ namespace LichensCPP
             // Check extension
             // Make better type detection later not only based on extension
             std::string ext = std::filesystem::path(file_path).extension().string();
-            std::transform(ext.begin(), ext.end(), ext.begin(), [](char c)
-                           { return std::tolower(c); });
+            to_lower(ext);
 
             if (ext == ".json")
             {

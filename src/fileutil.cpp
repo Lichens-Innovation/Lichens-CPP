@@ -19,7 +19,7 @@ namespace LichensCPP
             LOG_ERROR_S("Failed to open file: ", path);
             return false;
         }
-        file.write(reinterpret_cast<const char*>(data.data()), data.size());
+        file.write(reinterpret_cast<const char*>(data.data()), static_cast<std::streamsize>(data.size()));
         if (!file)
         {
             LOG_ERROR_S("Failed to write to file: ", path);
@@ -36,7 +36,7 @@ namespace LichensCPP
             LOG_ERROR_S("Failed to open file: ", path);
             return false;
         }
-        file.write(reinterpret_cast<const char *>(data), size);
+        file.write(reinterpret_cast<const char *>(data), static_cast<std::streamsize>(size));
         if (!file)
         {
             LOG_ERROR_S("Failed to write to file: ", path);
@@ -54,10 +54,10 @@ namespace LichensCPP
             return std::nullopt;
         }
 
-        const auto file_size = file.tellg();
+        const std::streamsize file_size = file.tellg();
         file.seekg(0);
 
-        std::vector<std::byte> buffer(file_size);
+        std::vector<std::byte> buffer(static_cast<size_t>(file_size));
         file.read(reinterpret_cast<char *>(buffer.data()), file_size);
         if (!file)
         {
