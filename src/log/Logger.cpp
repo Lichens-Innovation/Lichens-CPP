@@ -13,7 +13,9 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/syslog_sink.h>
+#ifndef _WIN32
+    #include <spdlog/sinks/syslog_sink.h>
+#endif
 
 #ifndef PLAZ_LOGGER_MAX_FILE_SIZE
     #define PLAZ_LOGGER_MAX_FILE_SIZE (5u * 1024u * 1024u)
@@ -29,6 +31,10 @@ struct Logger::LoggerPrivate
     std::shared_ptr<spdlog::logger> logger;
     std::mutex log_mutex;
     std::vector<spdlog::sink_ptr> sinks;
+    bool syslog_unsupported_requested = false;
+
+    static constexpr const char* syslog_unsupported_message =
+        "Syslog logger is not supported on this platform, it is ignored";
 
     spdlog::level::level_enum toSpdLevel(LogLevel level)
     {
@@ -69,11 +75,26 @@ struct Logger::LoggerPrivate
 
     void add_syslog_logger(const std::string& logger_name, LogLevel level)
     {
-        // TODO godboutj 2025-09-08, check if we should LOG_DAEMON instead of LOG_USER
         std::lock_guard<std::mutex> lock(log_mutex);
+#ifdef _WIN32
+        // syslog does not exist on Windows, the request is ignored and a warning is logged
+        // now if the logger is initialized, otherwise at init
+        (void)logger_name;
+        (void)level;
+        if (logger)
+        {
+            logger->warn(syslog_unsupported_message);
+        }
+        else
+        {
+            syslog_unsupported_requested = true;
+        }
+#else
+        // TODO godboutj 2025-09-08, check if we should LOG_DAEMON instead of LOG_USER
         auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(logger_name, 0, LOG_USER, true);
         syslog_sink->set_level(toSpdLevel(level));
         sinks.push_back(syslog_sink);
+#endif
     }
 
     void init(const std::string& logger_name)
@@ -83,6 +104,10 @@ struct Logger::LoggerPrivate
         logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
         logger->set_level(spdlog::level::trace); // Capture all levels; individual sinks filter their own levels
         logger->flush_on(spdlog::level::err); // Flush on error level and above
+        if (syslog_unsupported_requested)
+        {
+            logger->warn(syslog_unsupported_message);
+        }
     }
 
     void shutdown()
