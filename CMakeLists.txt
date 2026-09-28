@@ -150,8 +150,52 @@ endif()
 if(BUILD_LICHENS_CPP_MQTT)
     message(STATUS "Building Lichens-CPP MQTT module.")
     
-    # Paho MQTT C++ library must be install in the system from https://github.com/eclipse/paho.mqtt.cpp.git
-    find_package(PahoMqttCpp REQUIRED)
+    # Paho MQTT C++: use an installed copy if found, otherwise fetch it together with Paho C.
+    if(NOT FETCHCONTENT_TRY_FIND_PACKAGE_MODE STREQUAL "NEVER")
+        find_package(PahoMqttCpp QUIET GLOBAL)
+    endif()
+    if(NOT PahoMqttCpp_FOUND)
+        # Paho C is fetched on its own because PAHO_WITH_MQTT_C is broken in Paho C++ 1.5.3
+        # (it re-creates ALIAS targets its bundled Paho C 1.3.14 already defines).
+        # OVERRIDE_FIND_PACKAGE makes Paho C++'s find_package(eclipse-paho-mqtt-c) use the fetched
+        # copy, never an installed one.
+        # The fetched copies are static and without SSL (the MQTT module does not use TLS).
+        # These options are read by both Paho C and Paho C++.
+        set(PAHO_BUILD_STATIC ON CACHE BOOL "" FORCE)
+        set(PAHO_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+        set(PAHO_WITH_SSL OFF CACHE BOOL "" FORCE)
+        set(PAHO_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+        FetchContent_Declare(
+            eclipse-paho-mqtt-c
+            GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.c.git
+            # The Paho C version bundled with Paho C++ 1.5.3
+            GIT_TAG v1.3.14
+            OVERRIDE_FIND_PACKAGE
+        )
+        FetchContent_Declare(
+            PahoMqttCpp
+            GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.cpp.git
+            GIT_TAG v1.5.3
+            GIT_SUBMODULES ""
+        )
+        FetchContent_MakeAvailable(eclipse-paho-mqtt-c)
+        # A fetched Paho C only has an install export set, but Paho C++ also exports its
+        # targets from the build tree, which needs Paho C exported from the build tree too.
+        export(EXPORT eclipse-paho-mqtt-cTargets
+            NAMESPACE eclipse-paho-mqtt-c::
+            FILE ${CMAKE_CURRENT_BINARY_DIR}/eclipse-paho-mqtt-cTargets.cmake
+        )
+        FetchContent_MakeAvailable(PahoMqttCpp)
+        # Unlike installed (imported) targets, fetched targets do not have system include directories,
+        # so Paho's headers would get Lichens-CPP's warnings-as-errors.
+        # (FetchContent's SYSTEM option would do this, but needs CMake 3.25.)
+        foreach(PAHO_TARGET IN ITEMS paho-mqtt3a-static paho-mqttpp3-static)
+            get_target_property(PAHO_INCLUDES ${PAHO_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+            if(PAHO_INCLUDES)
+                set_property(TARGET ${PAHO_TARGET} APPEND PROPERTY INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${PAHO_INCLUDES})
+            endif()
+        endforeach()
+    endif()
 
     list(APPEND SOURCES 
         src/mqtt/MqttHelper.cpp
