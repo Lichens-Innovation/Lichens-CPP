@@ -60,8 +60,30 @@ jobs:
       - name: Parse and Display Test Results
         run: cat TestsResults.md >> $GITHUB_STEP_SUMMARY
 
+  # Linux build where every dependency is fetched, even if installed on the runner.
+  # Shared library, so the fetched static Paho is linked into a shared lichens_cpp.
+  test-linux-fetch:
+    name: Tests (ubuntu-latest, fetched dependencies)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-linux-fetch-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLICHENS_CPP_BUILD_SHARED=ON -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Run test
+        run: ./build/test_lichens_cpp
+
   # Lichens-CPP as the top-level project on MSVC, so its /W4 /WX flags apply.
-  # MQTT is off (Paho MQTT is find-only) and the other dependencies are always fetched, even if installed on the runner.
+  # Every dependency is fetched, even if installed on the runner.
   test-windows:
     name: Tests (windows-latest, MSVC)
     runs-on: windows-latest
@@ -74,7 +96,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake -S . -B build -DBUILD_LICHENS_CPP_MQTT=OFF -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
+        run: cmake -S . -B build -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
 
       # Debug too: the debug runtime's checked iterators catch out-of-range access that Release lets through
       - name: Build (Debug)
