@@ -5,8 +5,8 @@
  */
 
 #include "LichensCPP/config/Config.h"
+#include "LichensCPP/filesystem/filesystem.h"
 
-#include <filesystem>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -169,7 +169,8 @@ namespace LichensCPP
                 LOG_ERROR("Config file path is empty");
                 return false;
             }
-            if (!std::filesystem::exists(file_path))
+
+            if (!LichensCPP::filesystem::exists(file_path))
             {
                 LOG_ERROR_S("Config file does not exist: ", file_path);
                 return false;

@@ -3,15 +3,16 @@ project(lichens_cpp_project LANGUAGES CXX)
 
 cmake_policy(SET CMP0135 NEW)
 
-# C++ 17 or better
+# C++ 17 or better recommended
 if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
-    message(FATAL_ERROR "Lichens-CPP requires at least C++17. Current CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
+# C++ 14 or better required
+if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 14)
+    message(FATAL_ERROR "Lichens-CPP requires at least C++14. Current CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
 endif()
 
 message(STATUS "Lichens CPP using CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
@@ -54,13 +55,13 @@ set(BUILD_SHARED_LIBS OFF)
 
 # CMake options to enable/disable modules
 set(BUILD_LICHENS_CPP_LOG ON CACHE BOOL "Build the Log module.")
+option(BUILD_LICHENS_CPP_FILESYSTEM "Build the filesystem module." ON)
 option(BUILD_LICHENS_CPP_CONFIG "Build the Config module." ON)
 option(BUILD_LICHENS_CPP_LAUNCHER "Build the Launcher module." ON)
 option(BUILD_LICHENS_CPP_MQTT "Build the MQTT module." ON)
 option(BUILD_LICHENS_CPP_TESTS "Build the tests tree." ON)
 
 set(SOURCES
-    src/fileutil.cpp
     src/stringutil.cpp
     src/timeutil.cpp
     src/uuid.cpp
@@ -91,6 +92,46 @@ FetchContent_Declare(
     URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
     FIND_PACKAGE_ARGS GLOBAL
 )
+
+if(BUILD_LICHENS_CPP_FILESYSTEM)
+    message(STATUS "Building Lichens-CPP Filesystem module.")
+
+    # Check if need to shim the std::filesystem
+    set(NEEDS_GHC_FALLBACK FALSE)
+
+    if(ANDROID)
+        if(CMAKE_SYSTEM_VERSION LESS 24)
+            set(NEEDS_GHC_FALLBACK TRUE)
+            message(STATUS "  Android API level is < 24. Forcing ghc::filesystem fallback.")
+        endif()
+    elseif(CMAKE_CXX_STANDARD LESS 17)
+        set(NEEDS_GHC_FALLBACK TRUE)
+        message(STATUS "  C++ standard is lower than C++17. Enabling ghc::filesystem fallback.")
+    endif()
+
+    if(NEEDS_GHC_FALLBACK)
+        message(STATUS "  Fetching ghc::filesystem dependency via FetchContent...")
+        
+        FetchContent_Declare(
+            ghc_filesystem
+            GIT_REPOSITORY https://github.com/gulrak/filesystem
+            GIT_TAG        v1.5.16
+        )
+        
+        # This downloads and makes the 'ghc_filesystem' target available immediately
+        FetchContent_MakeAvailable(ghc_filesystem)
+        
+        # Append to your tracking list
+        list(APPEND LIBRARY_USED ghc_filesystem)
+    else()
+        message(STATUS "  C++ standard std::filesystem selected.")
+    endif()
+
+    list(APPEND SOURCES
+        src/filesystem/fileutil.cpp
+    )
+    list(APPEND MODULE_DEFINITIONS BUILD_LICHENS_CPP_FILESYSTEM)
+endif()
 
 # spdlog
 if(BUILD_LICHENS_CPP_LOG)

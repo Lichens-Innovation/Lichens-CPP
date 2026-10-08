@@ -27,3 +27,7 @@
 ## Version 0.4
 
 * Add thread safe queue
+* Add filesystem module optional
+* Move fileutil to optional filesystem module 
+* Add shim for std::filesystem with ghc::filesystem when filesystem is not available
+* Add shim compile define to indicate shim or standar version is being used

@@ -22,12 +22,14 @@ namespace LichensCPP
 
 // Use std::expected if available, otherwise fall back to tl::expected as shim
 #if __cpp_lib_expected >= 202202L
+    #define LICHENS_CPP_HAS_STD_EXPECTED 1
     template <class T, class E>
     using expected = std::expected<T, E>;
 
     template <class E>
     using unexpected = std::unexpected<E>;
 #else
+    #define LICHENS_CPP_HAS_STD_EXPECTED 0
     template <class T, class E>
     using expected = tl::expected<T, E>;
 

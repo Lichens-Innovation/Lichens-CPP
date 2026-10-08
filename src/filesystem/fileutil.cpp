@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#include "LichensCPP/fileutil.h"
+#include "LichensCPP/filesystem/fileutil.h"
 #include "LichensCPP/log/LoggerHelper.h"
 
 namespace LichensCPP
