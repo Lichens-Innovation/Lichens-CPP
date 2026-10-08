@@ -8,6 +8,9 @@
  */
 
 #include <gtest/gtest.h>
+#include <algorithm>
+#include <atomic>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <chrono>
@@ -157,10 +160,14 @@ TEST(ThreadSafeQueueTest, MultithreadedPushPop)
         });
     }
 
-    // Start consumers
+    // Start consumer: count successful pops, not attempts, so a timeout while
+    // producers are slow to schedule doesn't drop an item. The deadline keeps a
+    // genuinely lost item from hanging the test.
     std::thread consumer([&]()
     {
-        for (int i = 0; i < total_items; ++i)
+        const auto deadline = std::chrono::steady_clock::now() + 10s;
+        while (consumed_values.size() < static_cast<size_t>(total_items)
+               && std::chrono::steady_clock::now() < deadline)
         {
             auto value = queue.pop_wait(1ms);
             if (value.has_value())
@@ -278,7 +285,7 @@ TEST(ThreadSafeQueueTest, ProducerConsumerPattern)
     std::atomic<bool> done{false};
 
     // Producer thread
-    std::thread producer([&queue, &done, num_items]() {
+    std::thread producer([&]() {
         for (int i = 0; i < num_items; ++i)
         {
             queue.push(i);
