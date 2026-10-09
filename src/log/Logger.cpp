@@ -4,8 +4,8 @@
  * Copyright (c) 2025 Lichens Inc. All rights reserved.
  */
 #include "LichensCPP/log/Logger.h"
+#include "LichensCPP/filesystem/filesystem.h"
 
-#include <filesystem>
 #include <iostream>
 #include <mutex>
 #include <vector>
@@ -62,23 +62,25 @@ struct Logger::LoggerPrivate
         sinks.push_back(console_sink);
     }
 
+    #ifdef BUILD_LICHENS_CPP_FILESYSTEM
     void add_file_logger(const std::string& folder, const std::string& filename, LogLevel level)
     {
         const std::string log_file_path = std::string(folder) + "/" + std::string(filename);
         std::filesystem::create_directories(folder);
+
         std::lock_guard<std::mutex> lock(log_mutex);
         auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
             log_file_path, PLAZ_LOGGER_MAX_FILE_SIZE, PLAZ_LOGGER_MAX_FILES);
         file_sink->set_level(toSpdLevel(level));
         sinks.push_back(file_sink);
     }
+    #endif
 
     void add_syslog_logger(const std::string& logger_name, LogLevel level)
     {
         std::lock_guard<std::mutex> lock(log_mutex);
 #ifdef _WIN32
-        // syslog does not exist on Windows, the request is ignored and a warning is logged
-        // now if the logger is initialized, otherwise at init
+        #pragma message("Windows systlog not implemented yet.")
         (void)logger_name;
         (void)level;
         if (logger)
@@ -143,11 +145,13 @@ Logger& Logger::add_console_logger(LogLevel level)
     return *this;
 }
 
+#ifdef BUILD_LICHENS_CPP_FILESYSTEM
 Logger& Logger::add_file_logger(const std::string& folder, const std::string& filename, LogLevel level)
 {
     p_->add_file_logger(folder, filename, level);
     return *this;
 }
+#endif
 
 Logger& Logger::add_syslog_logger(const std::string& logger_name, LogLevel level)
 {

@@ -38,7 +38,9 @@ public:
     ~Logger();
 
     Logger& add_console_logger(LogLevel level);
+    #ifdef BUILD_LICHENS_CPP_FILESYSTEM
     Logger& add_file_logger(const std::string& folder, const std::string& filename, LogLevel level);
+    #endif
     Logger& add_syslog_logger(const std::string& logger_name, LogLevel level);
 
     // Must call the init after the add_xxx_logger methods but before any log()
