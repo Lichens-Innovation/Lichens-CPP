@@ -122,7 +122,7 @@ if(BUILD_LICHENS_CPP_FILESYSTEM)
         FetchContent_MakeAvailable(ghc_filesystem)
         
         # Append to your tracking list
-        list(APPEND LIBRARY_USED ghc_filesystem)
+        list(APPEND LIBRARY_USED ghcFilesystem::ghc_filesystem)
     else()
         message(STATUS "  C++ standard std::filesystem selected.")
     endif()
