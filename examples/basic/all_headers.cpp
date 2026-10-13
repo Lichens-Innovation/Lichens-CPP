@@ -22,7 +22,7 @@
 #include <LichensCPP/debouncing.h>
 #include <LichensCPP/expected.h>
 #include <LichensCPP/expected.hpp>
-#include <LichensCPP/fileutil.h>
+#include <LichensCPP/filesystem/fileutil.h>
 #ifndef _WIN32
     #include <LichensCPP/launcher/LaunchProcess.h>
 #endif
