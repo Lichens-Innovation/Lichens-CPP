@@ -4,7 +4,6 @@
  * Copyright (c) 2025 Lichens Inc. All rights reserved.
  */
 #include "LichensCPP/log/Logger.h"
-#include "LichensCPP/filesystem/filesystem.h"
 
 #include <iostream>
 #include <mutex>
@@ -62,11 +61,10 @@ struct Logger::LoggerPrivate
         sinks.push_back(console_sink);
     }
 
-    #ifdef BUILD_LICHENS_CPP_FILESYSTEM
     void add_file_logger(const std::string& folder, const std::string& filename, LogLevel level)
     {
-        const std::string log_file_path = std::string(folder) + "/" + std::string(filename);
-        std::filesystem::create_directories(folder);
+        // The spdlog file sink creates the missing parent folders on open
+        const std::string log_file_path = folder + "/" + filename;
 
         std::lock_guard<std::mutex> lock(log_mutex);
         auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
@@ -74,7 +72,6 @@ struct Logger::LoggerPrivate
         file_sink->set_level(toSpdLevel(level));
         sinks.push_back(file_sink);
     }
-    #endif
 
     void add_syslog_logger(const std::string& logger_name, LogLevel level)
     {
@@ -145,13 +142,11 @@ Logger& Logger::add_console_logger(LogLevel level)
     return *this;
 }
 
-#ifdef BUILD_LICHENS_CPP_FILESYSTEM
 Logger& Logger::add_file_logger(const std::string& folder, const std::string& filename, LogLevel level)
 {
     p_->add_file_logger(folder, filename, level);
     return *this;
 }
-#endif
 
 Logger& Logger::add_syslog_logger(const std::string& logger_name, LogLevel level)
 {

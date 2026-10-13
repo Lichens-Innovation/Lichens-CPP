@@ -72,6 +72,24 @@ TEST(LoggerTest, sinkLevelFiltersLowerLevels)
     EXPECT_NE(content.find("fatal message"), std::string::npos);
 }
 
+TEST(LoggerTest, fileLoggerCreatesMissingFolders)
+{
+    const auto root = std::filesystem::temp_directory_path() / "lichens_cpp_tests" / "missing_folders";
+    const auto folder = root / "nested" / "deeper";
+    const std::string filename = "logger_test_missing_folders.log";
+    std::error_code ec;
+    std::filesystem::remove_all(root, ec);
+    ASSERT_FALSE(std::filesystem::exists(root));
+
+    Logger logger;
+    logger.add_file_logger(folder.string(), filename, LogLevel::Trace).init("logger_test_missing_folders");
+    logger.log(LogLevel::Info, "info message");
+    logger.flush_all();
+
+    ASSERT_TRUE(std::filesystem::exists(folder / filename));
+    EXPECT_NE(read_file(folder / filename).find("[info] info message"), std::string::npos);
+}
+
 #ifndef _WIN32
 // The uppercase names are deprecated, silence the warning to check they still work
 #if defined(__GNUC__) || defined(__clang__)
