@@ -22,7 +22,14 @@
     #endif
 #endif
 
-#if !defined(LICHENSCPP_FORCE_FILESYSTEM_FALLBACK) && __cplusplus >= 201703L
+// MSVC only reports the real language version in __cplusplus with /Zc:__cplusplus, _MSVC_LANG is always correct
+#ifdef _MSVC_LANG
+    #define LICHENS_CPP_FILESYSTEM_CPLUSPLUS _MSVC_LANG
+#else
+    #define LICHENS_CPP_FILESYSTEM_CPLUSPLUS __cplusplus
+#endif
+
+#if !defined(LICHENS_CPP_FORCE_FILESYSTEM_FALLBACK) && LICHENS_CPP_FILESYSTEM_CPLUSPLUS >= 201703L
     #define LICHENS_CPP_HAS_STD_FILESYSTEM 1
     #include <filesystem>
 #else
