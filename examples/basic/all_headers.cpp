@@ -23,6 +23,7 @@
 #include <LichensCPP/expected.h>
 #include <LichensCPP/expected.hpp>
 #include <LichensCPP/filesystem/fileutil.h>
+#include <LichensCPP/init_list.h>
 #ifndef _WIN32
     #include <LichensCPP/launcher/LaunchProcess.h>
 #endif
@@ -40,6 +41,15 @@
 
 #include <string>
 
+namespace
+{
+struct InitListCheck
+{
+    int number;
+    char letter;
+};
+} // namespace
+
 // Instantiates the header templates and macros so that their warnings show up. Never called.
 void check_all_headers()
 {
@@ -52,6 +62,9 @@ void check_all_headers()
 
     LichensCPP::expected<int, std::string> value = LichensCPP::unexpected<std::string>("error");
     UNUSED(value.has_value());
+
+    InitListCheck init_list{LIL(.number) 32, LIL(.letter) 'y'};
+    UNUSED(init_list);
 
     UNUSED_LIST();
     UNUSED_LIST(1, "two");

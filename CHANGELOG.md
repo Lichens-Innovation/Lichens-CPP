@@ -31,3 +31,4 @@
 * Move fileutil to optional filesystem module 
 * Add shim for std::filesystem with ghc::filesystem when filesystem is not available
 * Add shim compile define to indicate shim or standar version is being used
+* Add LIL() macro for initialization list
