@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1.0-experimental
+# syntax=docker/dockerfile:1.0-experimental@sha256:cbd6491240cc8894d25e366ba83da19df1187f975dc3a5c2f88ce888ca696174
 # The syntax=docker/dockerfile:1.0-experimental is to allow ssh forwarding to clone private repositories
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
 
 LABEL authors="Lichens-CPP contributors"
 
