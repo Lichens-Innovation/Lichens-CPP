@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       # Build the basic example against this checkout instead of the remote repository,
       # with strict consumer warning flags and the Launcher module on
