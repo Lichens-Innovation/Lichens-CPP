@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Build Docker Image
         run: docker build -t lichens_cpp_test_image -f .devcontainer/Dockerfile .
@@ -46,13 +46,13 @@ jobs:
         run: docker stop test_container
 
       - name: Upload JSON Test Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: gtest-json-report
           path: TestsResults.json
       
       - name: Upload Markdown Test Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: gtest-md-report
           path: TestsResults.md
@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLICHENS_CPP_BUILD_SHARED=ON -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
@@ -93,7 +93,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.4.0
 
       - name: Configure
         run: cmake -S . -B build -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER
